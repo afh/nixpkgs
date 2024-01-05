@@ -534,7 +534,7 @@
     name = "James Alexander Feldman-Crough";
   };
   afontain = {
-    email = "antoine.fontaine@epfl.ch";
+    email = "afontain@posteo.net";
     github = "necessarily-equal";
     githubId = 59283660;
     name = "Antoine Fontaine";
@@ -4688,6 +4688,15 @@
       fingerprint = "8FD2 153F 4889 541A 54F1  E09E 71B6 C31C 8A5A 9D21";
     }];
   };
+  dixslyf = {
+    name = "Dixon Sean Low Yan Feng";
+    email = "dixonseanlow@protonmail.com";
+    github = "dixslyf";
+    githubId = 56017218;
+    keys = [{
+      fingerprint = "E6F4 BFB4 8DE3 893F 68FC  A15F FF5F 4B30 A41B BAC8";
+    }];
+  };
   djacu = {
     email = "daniel.n.baker@gmail.com";
     github = "djacu";
@@ -6697,7 +6706,7 @@
   };
   getpsyched = {
     name = "Priyanshu Tripathi";
-    email = "priyanshutr@proton.me";
+    email = "priyanshu@getpsyched.dev";
     matrix = "@getpsyched:matrix.org";
     github = "getpsyched";
     githubId = 43472218;
@@ -7516,6 +7525,16 @@
     githubId = 362833;
     name = "Hongchang Wu";
   };
+  honnip = {
+    name = "Jung seungwoo";
+    email = "me@honnip.page";
+    matrix = "@honnip:matrix.org";
+    github = "honnip";
+    githubId = 108175486;
+    keys = [{
+      fingerprint = "E4DD 51F7 FA3F DCF1 BAF6  A72C 576E 43EF 8482 E415";
+    }];
+  };
   hoppla20 = {
     email = "privat@vincentcui.de";
     github = "hoppla20";
@@ -7619,6 +7638,12 @@
     github = "humancalico";
     githubId = 51334444;
     name = "Akshat Agarwal";
+  };
+  hummeltech = {
+    email = "hummeltech2024@gmail.com";
+    github = "hummeltech";
+    githubId = 6109326;
+    name = "David Hummel";
   };
   huyngo = {
     email = "huyngo@disroot.org";
@@ -14618,15 +14643,6 @@
     githubId = 4303706;
     keys = [{
       fingerprint = "B00F E582 FD3F 0732 EA48  3937 F558 14E4 D687 4375";
-    }];
-  };
-  PlayerNameHere = {
-    name = "Dixon Sean Low Yan Feng";
-    email = "dixonseanlow@protonmail.com";
-    github = "dixslyf";
-    githubId = 56017218;
-    keys = [{
-      fingerprint = "E6F4 BFB4 8DE3 893F 68FC  A15F FF5F 4B30 A41B BAC8";
     }];
   };
   plchldr = {

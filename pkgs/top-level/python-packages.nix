@@ -362,6 +362,8 @@ self: super: with self; {
 
   aiortm = callPackage ../development/python-modules/aiortm { };
 
+  aiortsp = callPackage ../development/python-modules/aiortsp { };
+
   aioruckus = callPackage ../development/python-modules/aioruckus { };
 
   aiorun = callPackage ../development/python-modules/aiorun { };
@@ -1713,7 +1715,7 @@ self: super: with self; {
 
   btrfsutil = callPackage ../development/python-modules/btrfsutil { };
 
-  btsmarthub_devicelist = callPackage ../development/python-modules/btsmarthub_devicelist { };
+  btsmarthub-devicelist = callPackage ../development/python-modules/btsmarthub-devicelist { };
 
   btsocket = callPackage ../development/python-modules/btsocket { };
 
@@ -2370,7 +2372,7 @@ self: super: with self; {
 
   cot = callPackage ../development/python-modules/cot { };
 
-  covCore = callPackage ../development/python-modules/cov-core { };
+  cov-core = callPackage ../development/python-modules/cov-core { };
 
   coverage = callPackage ../development/python-modules/coverage { };
 
@@ -2522,7 +2524,7 @@ self: super: with self; {
 
   cx-freeze = callPackage ../development/python-modules/cx-freeze { };
 
-  cx_oracle = callPackage ../development/python-modules/cx_oracle { };
+  cx-oracle = callPackage ../development/python-modules/cx-oracle { };
 
   cxxfilt = callPackage ../development/python-modules/cxxfilt { };
 
@@ -3027,6 +3029,8 @@ self: super: with self; {
 
   django-csp = callPackage ../development/python-modules/django-csp { };
 
+  django-currentuser = callPackage ../development/python-modules/django-currentuser { };
+
   django-debug-toolbar = callPackage ../development/python-modules/django-debug-toolbar { };
 
   django-dynamic-preferences = callPackage ../development/python-modules/django-dynamic-preferences { };
@@ -3094,6 +3098,8 @@ self: super: with self; {
   django-model-utils = callPackage ../development/python-modules/django-model-utils { };
 
   django-modelcluster = callPackage ../development/python-modules/django-modelcluster { };
+
+  django-modeltranslation = callPackage ../development/python-modules/django-modeltranslation { };
 
   django-multiselectfield = callPackage ../development/python-modules/django-multiselectfield { };
 
@@ -3293,7 +3299,7 @@ self: super: with self; {
 
   dockerpty = callPackage ../development/python-modules/dockerpty { };
 
-  docker_pycreds = callPackage ../development/python-modules/docker-pycreds { };
+  docker-pycreds = callPackage ../development/python-modules/docker-pycreds { };
 
   docker-py = callPackage ../development/python-modules/docker-py { };
 
@@ -3398,6 +3404,8 @@ self: super: with self; {
   dronecan = callPackage ../development/python-modules/dronecan { };
 
   dropbox = callPackage ../development/python-modules/dropbox { };
+
+  dropmqttapi = callPackage ../development/python-modules/dropmqttapi { };
 
   ds-store = callPackage ../development/python-modules/ds-store { };
 
@@ -3815,7 +3823,7 @@ self: super: with self; {
 
   extruct = callPackage ../development/python-modules/extruct { };
 
-  eyeD3 = callPackage ../development/python-modules/eyed3 { };
+  eyed3 = callPackage ../development/python-modules/eyed3 { };
 
   ezdxf = callPackage ../development/python-modules/ezdxf { };
 
@@ -3974,7 +3982,7 @@ self: super: with self; {
 
   file-read-backwards = callPackage ../development/python-modules/file-read-backwards { };
 
-  filebrowser_safe = callPackage ../development/python-modules/filebrowser_safe { };
+  filebrowser-safe = callPackage ../development/python-modules/filebrowser-safe { };
 
   filebytes = callPackage ../development/python-modules/filebytes { };
 
@@ -4204,7 +4212,7 @@ self: super: with self; {
 
   flower = callPackage ../development/python-modules/flower { };
 
-  flowlogs_reader = callPackage ../development/python-modules/flowlogs_reader { };
+  flowlogs-reader = callPackage ../development/python-modules/flowlogs-reader { };
 
   fluent-logger = callPackage ../development/python-modules/fluent-logger { };
 
@@ -4581,7 +4589,7 @@ self: super: with self; {
 
   github-webhook = callPackage ../development/python-modules/github-webhook { };
 
-  github3_py = callPackage ../development/python-modules/github3_py { };
+  github3-py = callPackage ../development/python-modules/github3-py { };
 
   gitignore-parser = callPackage ../development/python-modules/gitignore-parser { };
 
@@ -10202,6 +10210,8 @@ self: super: with self; {
 
   pydantic = callPackage ../development/python-modules/pydantic { };
 
+  pydantic-compat = callPackage ../development/python-modules/pydantic-compat { };
+
   pydantic-core = callPackage ../development/python-modules/pydantic-core { };
 
   pydantic-extra-types = callPackage ../development/python-modules/pydantic-extra-types { };
@@ -11743,7 +11753,7 @@ self: super: with self; {
 
   python-mapnik = callPackage ../development/python-modules/python-mapnik rec {
     inherit (pkgs) pkg-config cairo icu libjpeg libpng libtiff libwebp proj zlib;
-    boost182 = pkgs.boost182.override {
+    boost = pkgs.boost182.override {
       enablePython = true;
       inherit python;
     };
@@ -12442,11 +12452,11 @@ self: super: with self; {
 
   reportlab = callPackage ../development/python-modules/reportlab { };
 
-  repoze_lru = callPackage ../development/python-modules/repoze_lru { };
+  repoze-lru = callPackage ../development/python-modules/repoze-lru { };
 
-  repoze_sphinx_autointerface = callPackage ../development/python-modules/repoze_sphinx_autointerface { };
+  repoze-sphinx-autointerface = callPackage ../development/python-modules/repoze-sphinx-autointerface { };
 
-  repoze_who = callPackage ../development/python-modules/repoze_who { };
+  repoze-who = callPackage ../development/python-modules/repoze-who { };
 
   reproject = callPackage ../development/python-modules/reproject { };
 
@@ -13619,6 +13629,8 @@ self: super: with self; {
   sqids = callPackage ../development/python-modules/sqids { };
 
   sqlalchemy = callPackage ../development/python-modules/sqlalchemy { };
+
+  sqlalchemy_1_4 = callPackage ../development/python-modules/sqlalchemy/1_4.nix { };
 
   sqlalchemy-citext = callPackage ../development/python-modules/sqlalchemy-citext { };
 
