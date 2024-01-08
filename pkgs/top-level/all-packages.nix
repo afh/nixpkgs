@@ -9797,7 +9797,7 @@ with pkgs;
     stdenv = gccStdenv;
   };
 
-  keepkey_agent = with python3Packages; toPythonApplication keepkey_agent;
+  keepkey-agent = with python3Packages; toPythonApplication keepkey-agent;
 
   keepmenu = callPackage ../applications/misc/keepmenu { };
 
@@ -9857,8 +9857,6 @@ with pkgs;
   };
 
   krakenx = callPackage ../tools/system/krakenx { };
-
-  partition-manager = libsForQt5.callPackage ../tools/misc/partition-manager { };
 
   kpcli = callPackage ../tools/security/kpcli { };
 
@@ -10970,7 +10968,7 @@ with pkgs;
   mole = callPackage ../tools/networking/mole { };
 
   morgen = callPackage ../applications/office/morgen {
-    electron = electron_25; # blank screen with electron_26
+    electron = electron_28;
   };
 
   mosh = callPackage ../tools/networking/mosh { };
@@ -14049,7 +14047,7 @@ with pkgs;
     buildGoModule = buildGo120Module;
   };
 
-  trezor_agent = with python3Packages; toPythonApplication trezor_agent;
+  trezor-agent = with python3Packages; toPythonApplication trezor-agent;
 
   trezor-suite = callPackage ../applications/blockchains/trezor-suite { };
 
@@ -16592,7 +16590,7 @@ with pkgs;
   lld_16 = llvmPackages_16.lld;
   lld_17 = llvmPackages_17.lld;
 
-  lldb = lldb_14;
+  lldb = llvmPackages.lldb;
   lldb_6 = llvmPackages_6.lldb;
   lldb_8 = llvmPackages_8.lldb;
   lldb_9 = llvmPackages_9.lldb;
@@ -21263,6 +21261,8 @@ with pkgs;
 
   flint = callPackage ../development/libraries/flint { };
 
+  flint3 = callPackage ../development/libraries/flint/3.nix { };
+
   flite = callPackage ../development/libraries/flite { };
 
   fltk13 = callPackage ../development/libraries/fltk {
@@ -23962,6 +23962,7 @@ with pkgs;
     inherit (darwin.apple_sdk_11_0.frameworks) OpenGL;
     inherit (darwin.apple_sdk_11_0.libs) Xplugin;
   };
+  mesa_i686 = pkgsi686Linux.mesa; # make it build on Hydra
 
   mesa_glu =  callPackage ../development/libraries/mesa-glu {
     inherit (darwin.apple_sdk.frameworks) ApplicationServices;
@@ -24978,8 +24979,6 @@ with pkgs;
   simp_le = callPackage ../tools/admin/simp_le { };
 
   simpleitk = callPackage ../development/libraries/simpleitk { lua = lua5_4; };
-
-  sioclient = callPackage ../development/libraries/sioclient { };
 
   sfml = callPackage ../development/libraries/sfml {
     inherit (darwin.apple_sdk.frameworks) IOKit Foundation AppKit OpenAL;
@@ -26034,9 +26033,7 @@ with pkgs;
 
   # GNU Common Lisp
   gcl = wrapLisp {
-    pkg = callPackage ../development/compilers/gcl {
-      gmp = gmp4;
-    };
+    pkg = callPackage ../development/compilers/gcl { };
     faslExt = "o";
   };
 
@@ -26047,17 +26044,17 @@ with pkgs;
   };
 
   # Steel Bank Common Lisp
-  sbcl_2_3_10 = wrapLisp {
-    pkg = callPackage ../development/compilers/sbcl/2.x.nix { version = "2.3.10"; };
-    faslExt = "fasl";
-    flags = [ "--dynamic-space-size" "3000" ];
-  };
   sbcl_2_3_11 = wrapLisp {
     pkg = callPackage ../development/compilers/sbcl/2.x.nix { version = "2.3.11"; };
     faslExt = "fasl";
     flags = [ "--dynamic-space-size" "3000" ];
   };
-  sbcl = sbcl_2_3_11;
+  sbcl_2_4_0 = wrapLisp {
+    pkg = callPackage ../development/compilers/sbcl/2.x.nix { version = "2.4.0"; };
+    faslExt = "fasl";
+    flags = [ "--dynamic-space-size" "3000" ];
+  };
+  sbcl = sbcl_2_4_0;
 
   sbclPackages = recurseIntoAttrs sbcl.pkgs;
 
@@ -26833,9 +26830,8 @@ with pkgs;
 
   rspamd = callPackage ../servers/mail/rspamd { };
 
-  pfixtools = callPackage ../servers/mail/postfix/pfixtools.nix {
-    gperf = gperf_3_0;
-  };
+  pfixtools = callPackage ../servers/mail/postfix/pfixtools.nix { };
+
   pflogsumm = callPackage ../servers/mail/postfix/pflogsumm.nix { };
 
   pomerium = callPackage ../servers/http/pomerium { };
@@ -28115,10 +28111,6 @@ with pkgs;
   linuxPackages_testing = linuxKernel.packages.linux_testing;
   linux_testing = linuxKernel.kernels.linux_testing;
 
-  # FIXME: Remove and alias to `linux(Packages)_testing`` after 23.11 is released
-  linuxPackages_testing_bcachefs = linuxKernel.packages.linux_testing_bcachefs;
-  linux_testing_bcachefs = linuxKernel.kernels.linux_testing_bcachefs;
-
   # Realtime kernel
   linuxPackages-rt = linuxKernel.packageAliases.linux_rt_default;
   linuxPackages-rt_latest = linuxKernel.packageAliases.linux_rt_latest;
@@ -28379,6 +28371,8 @@ with pkgs;
   go-toml = callPackage ../development/tools/go-toml { };
 
   go-outline = callPackage ../development/tools/go-outline { };
+
+  gocode = callPackage ../development/tools/gocode { };
 
   gocode-gomod = callPackage ../development/tools/gocode-gomod { };
 
@@ -30296,7 +30290,7 @@ with pkgs;
   aaxtomp3 = callPackage ../applications/audio/aaxtomp3 { };
 
   abcde = callPackage ../applications/audio/abcde {
-    inherit (python3Packages) eyeD3;
+    inherit (python3Packages) eyed3;
   };
 
   abiword = callPackage ../applications/office/abiword { };
@@ -31587,8 +31581,6 @@ with pkgs;
 
   fritzing = libsForQt5.callPackage ../applications/science/electronics/fritzing { };
 
-  fritzprofiles = with python3.pkgs; toPythonApplication fritzprofiles;
-
   fsv = callPackage ../applications/misc/fsv { };
 
   ft2-clone = callPackage ../applications/audio/ft2-clone {
@@ -31858,7 +31850,9 @@ with pkgs;
 
   feishu = callPackage ../applications/networking/instant-messengers/feishu { };
 
-  filezilla = callPackage ../applications/networking/ftp/filezilla { };
+  filezilla = darwin.apple_sdk_11_0.callPackage ../applications/networking/ftp/filezilla {
+    inherit (darwin.apple_sdk_11_0.frameworks) CoreServices Security;
+  };
 
   fire = darwin.apple_sdk_11_0.callPackage ../applications/audio/fire {
     inherit (darwin.apple_sdk_11_0.frameworks) Accelerate Cocoa WebKit CoreServices DiscRecording CoreAudioKit MetalKit;
@@ -31876,13 +31870,28 @@ with pkgs;
   firefox-esr-unwrapped = firefoxPackages.firefox-esr-115;
 
   firefox = wrapFirefox firefox-unwrapped { };
-  firefox-beta = wrapFirefox firefox-beta-unwrapped { };
-  firefox-devedition = wrapFirefox firefox-devedition-unwrapped { };
+  firefox-beta = wrapFirefox firefox-beta-unwrapped {
+    nameSuffix = "-beta";
+    desktopName = "Firefox Beta";
+    wmClass = "firefox-beta";
+    icon = "firefox-beta";
+  };
+  firefox-devedition = wrapFirefox firefox-devedition-unwrapped {
+    nameSuffix = "-devedition";
+    desktopName = "Firefox Developer Edition";
+    wmClass = "firefox-devedition";
+    icon = "firefox-devedition";
+  };
 
   firefox-mobile = callPackage ../applications/networking/browsers/firefox/mobile-config.nix { };
 
   firefox-esr = firefox-esr-115;
-  firefox-esr-115 = wrapFirefox firefox-esr-115-unwrapped { };
+  firefox-esr-115 = wrapFirefox firefox-esr-115-unwrapped {
+    nameSuffix = "-esr";
+    desktopName = "Firefox ESR";
+    wmClass = "firefox-esr";
+    icon = "firefox-esr";
+  };
 
   firefox-bin-unwrapped = callPackage ../applications/networking/browsers/firefox-bin {
     inherit (gnome) adwaita-icon-theme;
@@ -32871,9 +32880,7 @@ with pkgs;
 
   istioctl = callPackage ../applications/networking/cluster/istioctl { };
 
-  bip = callPackage ../applications/networking/irc/bip {
-    openssl = openssl_1_1;
-  };
+  bip = callPackage ../applications/networking/irc/bip { };
 
   j4-dmenu-desktop = callPackage ../applications/misc/j4-dmenu-desktop { };
 
@@ -37063,7 +37070,7 @@ with pkgs;
     inherit (darwin) autoSignDarwinBinariesHook;
   };
 
-  ledger_agent = with python3Packages; toPythonApplication ledger_agent;
+  ledger-agent = with python3Packages; toPythonApplication ledger-agent;
 
   ledger-live-desktop = callPackage ../applications/blockchains/ledger-live-desktop { };
 
@@ -37486,6 +37493,8 @@ with pkgs;
   bastet = callPackage ../games/bastet { };
 
   beancount-ing-diba = callPackage ../applications/office/beancount/beancount-ing-diba.nix { };
+
+  beancount-share = callPackage ../applications/office/beancount/beancount_share.nix { };
 
   black-hole-solver = callPackage ../games/black-hole-solver {
     inherit (perlPackages) PathTiny;
@@ -39983,7 +39992,7 @@ with pkgs;
 
   fastjet-contrib = callPackage ../development/libraries/physics/fastjet-contrib { };
 
-  fastnlo_toolkit = callPackage ../development/libraries/physics/fastnlo_toolkit { };
+  fastnlo-toolkit = callPackage ../development/libraries/physics/fastnlo-toolkit { };
 
   geant4 = libsForQt5.callPackage ../development/libraries/physics/geant4 { };
 
@@ -40848,7 +40857,7 @@ with pkgs;
   pwntools = with python3Packages; toPythonApplication pwntools;
 
   putty = callPackage ../applications/networking/remote/putty {
-    gtk2 = gtk2-x11;
+    gtk3 = if stdenv.isDarwin then gtk3-x11 else gtk3;
   };
 
   qMasterPassword = qt6Packages.callPackage ../applications/misc/qMasterPassword { };

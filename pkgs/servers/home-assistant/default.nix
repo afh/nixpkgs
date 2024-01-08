@@ -258,6 +258,16 @@ let
         };
       });
 
+      python-roborock = super.python-roborock.overridePythonAttrs (oldAttrs: rec {
+        version = "0.38.0";
+        src = fetchFromGitHub {
+          owner = "humbertogontijo";
+          repo = "python-roborock";
+          rev = "refs/tags/v${version}";
+          hash = "sha256-jYESUMhLb5oiM3PWIIIU4dn/waGUnCAaXe0URnIq0C8=";
+        };
+      });
+
       python-slugify = super.python-slugify.overridePythonAttrs (oldAttrs: rec {
         pname = "python-slugify";
         version = "4.0.1";
@@ -312,7 +322,7 @@ let
   extraBuildInputs = extraPackages python.pkgs;
 
   # Don't forget to run parse-requirements.py after updating
-  hassVersion = "2024.1.0";
+  hassVersion = "2024.1.2";
 
 in python.pkgs.buildPythonApplication rec {
   pname = "homeassistant";
@@ -330,13 +340,13 @@ in python.pkgs.buildPythonApplication rec {
     owner = "home-assistant";
     repo = "core";
     rev = "refs/tags/${version}";
-    hash = "sha256-aNSyBr4QEK4pmYnRGW1LNuCSU5EpZtLEGQUtYL+CvUg=";
+    hash = "sha256-FlGSVYgKDw0x4l1z1qe+cUAuzFH0XrE2o7LC2ByY5Bo=";
   };
 
   # Secondary source is pypi sdist for translations
   sdist = fetchPypi {
     inherit pname version;
-    hash = "sha256-szlvSfkcPG6DGGHZ5iNtz0EBa8DVYaoGZWSlc7AEG1I=";
+    hash = "sha256-ijs9RNx17JI0nSHCBB3ysgrM4OdOtcH/96O9DcrTtFQ=";
   };
 
   nativeBuildInputs = with python.pkgs; [

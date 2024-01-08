@@ -9308,6 +9308,12 @@
     githubId = 5124422;
     name = "Julien Urraca";
   };
+  justanotherariel = {
+    email = "ariel@ebersberger.io";
+    github = "justanotherariel";
+    githubId = 31776703;
+    name = "Ariel Ebersberger";
+  };
   justinas = {
     email = "justinas@justinas.org";
     github = "justinas";
@@ -13023,6 +13029,12 @@
     github = "ne9z";
     githubId = 77314501;
     name = "Maurice Zhou";
+  };
+  Nebucatnetzer = {
+    email = "andreas+nixpkgs@zweili.ch";
+    github = "Nebucatnetzer";
+    githubId = 2287221;
+    name = "Andreas Zweili";
   };
   Necior = {
     email = "adrian@sadlocha.eu";
@@ -17005,6 +17017,12 @@
     keys = [{
       fingerprint = "ADF4 C13D 0E36 1240 BD01  9B51 D1DE 6D7F 6936 63A5";
     }];
+  };
+  Silver-Golden = {
+    name = "Brendan Golden";
+    email = "github+nixpkgs@brendan.ie";
+    github = "Silver-Golden";
+    githubId = 7858375;
   };
   simarra = {
     name = "simarra";
