@@ -185,6 +185,14 @@ in {
       ];
     };
 
+    linux_6_7 = callPackage ../os-specific/linux/kernel/mainline.nix {
+      branch = "6.7";
+      kernelPatches = [
+        kernelPatches.bridge_stp_helper
+        kernelPatches.request_key_helper
+      ];
+    };
+
     linux_testing = let
       testing = callPackage ../os-specific/linux/kernel/mainline.nix {
         # A special branch that tracks the kernel under the release process
@@ -290,15 +298,7 @@ in {
 
     akvcam = callPackage ../os-specific/linux/akvcam { };
 
-    amdgpu-pro = callPackage ../os-specific/linux/amdgpu-pro {
-      libffi = pkgs.libffi.overrideAttrs (orig: rec {
-        version = "3.3";
-        src = fetchurl {
-          url = "https://github.com/libffi/libffi/releases/download/v${version}/${orig.pname}-${version}.tar.gz";
-          sha256 = "0mi0cpf8aa40ljjmzxb7im6dbj45bb0kllcd09xgmp834y9agyvj";
-        };
-      });
-    };
+    amdgpu-pro = callPackage ../os-specific/linux/amdgpu-pro { };
 
     apfs = callPackage ../os-specific/linux/apfs { };
 
@@ -586,6 +586,7 @@ in {
     linux_6_1 = recurseIntoAttrs (packagesFor kernels.linux_6_1);
     linux_6_5 = recurseIntoAttrs (packagesFor kernels.linux_6_5);
     linux_6_6 = recurseIntoAttrs (packagesFor kernels.linux_6_6);
+    linux_6_7 = recurseIntoAttrs (packagesFor kernels.linux_6_7);
     __attrsFailEvaluation = true;
   } // lib.optionalAttrs config.allowAliases {
     linux_4_9 = throw "linux 4.9 was removed because it will reach its end of life within 22.11"; # Added 2022-11-08
@@ -650,7 +651,7 @@ in {
   packageAliases = {
     linux_default = packages.linux_6_1;
     # Update this when adding the newest kernel major version!
-    linux_latest = packages.linux_6_6;
+    linux_latest = packages.linux_6_7;
     linux_mptcp = throw "'linux_mptcp' has been moved to https://github.com/teto/mptcp-flake";
     linux_rt_default = packages.linux_rt_5_4;
     linux_rt_latest = packages.linux_rt_6_1;

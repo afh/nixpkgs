@@ -1482,6 +1482,8 @@ self: super: with self; {
 
   bip32 = callPackage ../development/python-modules/bip32 { };
 
+  birch = callPackage ../development/python-modules/birch { };
+
   bitarray = callPackage ../development/python-modules/bitarray { };
 
   bitbox02 = callPackage ../development/python-modules/bitbox02 { };
@@ -1555,6 +1557,8 @@ self: super: with self; {
   blockfrost-python = callPackage ../development/python-modules/blockfrost-python { };
 
   blocksat-cli = callPackage ../development/python-modules/blocksat-cli { };
+
+  bloodhound-py = callPackage ../development/python-modules/bloodhound-py { };
 
   blosc2 = callPackage ../development/python-modules/blosc2 { };
 
@@ -3550,6 +3554,8 @@ self: super: with self; {
     inherit (pkgs) edlib;
   };
 
+  eduvpn-common = callPackage ../development/python-modules/eduvpn-common { };
+
   edward = callPackage ../development/python-modules/edward { };
 
   effdet = callPackage ../development/python-modules/effdet { };
@@ -3677,6 +3683,8 @@ self: super: with self; {
   ephem = callPackage ../development/python-modules/ephem { };
 
   ephemeral-port-reserve = callPackage ../development/python-modules/ephemeral-port-reserve { };
+
+  epion = callPackage ../development/python-modules/epion { };
 
   epson-projector = callPackage ../development/python-modules/epson-projector { };
 
@@ -9354,6 +9362,8 @@ self: super: with self; {
 
   pyatag = callPackage ../development/python-modules/pyatag { };
 
+  pyatem = callPackage ../development/python-modules/pyatem { };
+
   pyatome = callPackage ../development/python-modules/pyatome { };
 
   pycketcasts = callPackage ../development/python-modules/pycketcasts { };
@@ -9694,7 +9704,7 @@ self: super: with self; {
 
   portpicker = callPackage ../development/python-modules/portpicker { };
 
-  posix_ipc = callPackage ../development/python-modules/posix_ipc { };
+  posix-ipc = callPackage ../development/python-modules/posix-ipc { };
 
   posthog = callPackage ../development/python-modules/posthog { };
 
@@ -10411,7 +10421,7 @@ self: super: with self; {
     SDL2_image = pkgs.SDL2_image_2_0_5;
   };
 
-  pygame_sdl2 = callPackage ../development/python-modules/pygame_sdl2 { };
+  pygame-sdl2 = callPackage ../development/python-modules/pygame-sdl2 { };
 
   pygame-gui = callPackage ../development/python-modules/pygame-gui { };
 
@@ -10982,11 +10992,11 @@ self: super: with self; {
   };
 
   /*
-    `pyqt5_with_qtwebkit` should not be used by python libraries in
+    `pyqt5-webkit` should not be used by python libraries in
     pkgs/development/python-modules/*. Putting this attribute in
     `propagatedBuildInputs` may cause collisions.
   */
-  pyqt5_with_qtwebkit = self.pyqt5.override {
+  pyqt5-webkit = self.pyqt5.override {
     withWebKit = true;
   };
 
@@ -11344,6 +11354,8 @@ self: super: with self; {
   pytautulli = callPackage ../development/python-modules/pytautulli { };
 
   pyte = callPackage ../development/python-modules/pyte { };
+
+  pytedee-async = callPackage ../development/python-modules/pytedee-async { };
 
   pytenable = callPackage ../development/python-modules/pytenable { };
 
@@ -12135,6 +12147,8 @@ self: super: with self; {
   pyyaml-include = callPackage ../development/python-modules/pyyaml-include { };
 
   pyyardian = callPackage ../development/python-modules/pyyardian { };
+
+  pyzabbix = callPackage ../development/python-modules/pyzabbix { };
 
   pyzerproc = callPackage ../development/python-modules/pyzerproc { };
 
@@ -13782,6 +13796,8 @@ self: super: with self; {
 
   strawberry-graphql = callPackage ../development/python-modules/strawberry-graphql { };
 
+  strct = callPackage ../development/python-modules/strct { };
+
   streamdeck = callPackage ../development/python-modules/streamdeck { };
 
   streaming-form-data = callPackage ../development/python-modules/streaming-form-data { };
@@ -15414,6 +15430,8 @@ self: super: with self; {
   types-html5lib = callPackage ../development/python-modules/types-html5lib { };
 
   types-ipaddress = callPackage ../development/python-modules/types-ipaddress { };
+
+  types-markdown = callPackage ../development/python-modules/types-markdown { };
 
   types-mock = callPackage ../development/python-modules/types-mock { };
 
