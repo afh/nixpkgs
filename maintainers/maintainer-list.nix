@@ -599,6 +599,16 @@
     githubId = 4732885;
     name = "Ivan Jager";
   };
+  aikooo7 = {
+    name = "Diogo Fernandes";
+    email = "prozinhopro1973@gmail.com";
+    matrix = "@aikoo7:matrix.org";
+    github = "aikooo7";
+    githubId = 79667753;
+    keys = [{
+      fingerprint = "B0D7 2955 235F 6AB5 ACFA  1619 8C7F F5BB 1ADE F191";
+    }];
+  };
   aiotter = {
     email = "git@aiotter.com";
     github = "aiotter";
@@ -13614,6 +13624,13 @@
     github = "npulidomateo";
     githubId = 13149442;
     name = "Nico Pulido-Mateo";
+  };
+  nrabulinski = {
+    email = "1337-nix@nrab.lol";
+    matrix = "@niko:nrab.lol";
+    github = "nrabulinski";
+    githubId = 24574288;
+    name = "Nikodem Rabuliński";
   };
   nrdxp = {
     email = "tim.deh@pm.me";
