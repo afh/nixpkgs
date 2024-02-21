@@ -3,23 +3,22 @@
 # to have been exported through cmake as well.
 { lib
 , stdenv
-, abseil-cpp
 , buildPackages
 , cmake
 , fetchFromGitHub
 , fetchpatch
 , gtest
 , zlib
-, version
-, hash
 
   # downstream dependencies
 , python3
 , grpc
 , enableShared ? !stdenv.hostPlatform.isStatic
 
-, ...
+, meta
 }:
+
+{ version, hash, abseil-cpp }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "protobuf";
@@ -98,17 +97,5 @@ stdenv.mkDerivation (finalAttrs: {
     inherit abseil-cpp;
   };
 
-  meta = {
-    description = "Google's data interchange format";
-    longDescription = ''
-      Protocol Buffers are a way of encoding structured data in an efficient
-      yet extensible format. Google uses Protocol Buffers for almost all of
-      its internal RPC protocols and file formats.
-    '';
-    license = lib.licenses.bsd3;
-    platforms = lib.platforms.all;
-    homepage = "https://protobuf.dev/";
-    maintainers = with lib.maintainers; [ jonringer ];
-    mainProgram = "protoc";
-  };
+  inherit meta;
 })

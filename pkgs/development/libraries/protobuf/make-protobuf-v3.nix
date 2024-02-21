@@ -1,9 +1,15 @@
-{ lib, stdenv
+{ lib
+, stdenv
 , fetchFromGitHub
-, autoreconfHook, zlib, gtest, buildPackages
-, version, sha256
-, ...
+, autoreconfHook
+, zlib
+, gtest
+, buildPackages
+
+, meta
 }:
+
+{ version, hash, abseil-cpp }:
 
 let
 mkProtobufDerivation = buildProtobuf: stdenv: stdenv.mkDerivation {
@@ -15,7 +21,7 @@ mkProtobufDerivation = buildProtobuf: stdenv: stdenv.mkDerivation {
     owner = "protocolbuffers";
     repo = "protobuf";
     rev = "v${version}";
-    inherit sha256;
+    inherit hash;
   };
 
   postPatch = ''
@@ -41,16 +47,8 @@ mkProtobufDerivation = buildProtobuf: stdenv: stdenv.mkDerivation {
 
   dontDisableStatic = true;
 
-  meta = {
-    description = "Google's data interchange format";
-    longDescription =
-      ''Protocol Buffers are a way of encoding structured data in an efficient
-        yet extensible format. Google uses Protocol Buffers for almost all of
-        its internal RPC protocols and file formats.
-      '';
-    homepage = "https://developers.google.com/protocol-buffers/";
-    license = lib.licenses.bsd3;
-    mainProgram = "protoc";
+  meta = meta // {
+    maintainers = [];
     platforms = lib.platforms.unix;
   };
 };
