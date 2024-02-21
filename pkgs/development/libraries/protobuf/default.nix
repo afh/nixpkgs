@@ -2,6 +2,7 @@
 , stdenv
 , abseil-cpp
 , abseil-cpp_202103
+, abseil-cpp_202308
 , autoreconfHook
 , buildPackages
 , cmake
@@ -51,7 +52,7 @@ in
   protobuf_23 = make-protobuf {
     version = "23.4";
     hash = "sha256-eI+mrsZAOLEsdyTC3B+K+GjD3r16CmPx1KJ2KhCwFdg=";
-    inherit abseil-cpp;
+    abseil-cpp = abseil-cpp_202308;
   };
   protobuf_21 = make-protobuf {
     version = "21.12";
