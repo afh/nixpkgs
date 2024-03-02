@@ -33,6 +33,10 @@ stdenv.mkDerivation rec {
       --replace math.h cmath
   '';
 
+  env = lib.optionalAttrs stdenv.cc.isClang {
+    NIX_CFLAGS_COMPILE = "-Wno-error=unqualified-std-cast-call";
+  };
+
   meta = {
     description = "A library for handling the COLLADA file format";
     homepage = "https://github.com/KhronosGroup/OpenCOLLADA/";
