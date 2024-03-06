@@ -34,11 +34,11 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-    "-DSNAPPY_BUILD_TESTS=OFF"
-    "-DSNAPPY_BUILD_BENCHMARKS=OFF"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !static;
+    SNAPPY_BUILD_TESTS = false;
+    SNAPPY_BUILD_BENCHMARKS = false;
+  };
 
   postInstall = ''
     substituteInPlace "$out"/lib/cmake/Snappy/SnappyTargets.cmake \

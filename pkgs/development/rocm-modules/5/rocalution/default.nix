@@ -58,26 +58,28 @@ stdenv.mkDerivation (finalAttrs: {
     gtest
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_CXX_COMPILER=hipcc"
-    "-DROCM_PATH=${clr}"
-    "-DHIP_ROOT_DIR=${clr}"
-    "-DSUPPORT_HIP=ON"
-    "-DSUPPORT_OMP=ON"
-    "-DSUPPORT_MPI=ON"
-    "-DBUILD_CLIENTS_SAMPLES=${if buildSamples then "ON" else "OFF"}"
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "BUILD_CLIENTS_" {
+    TESTS = buildTests;
+    BENCHMARKS = buildBenchmarks;
+    SAMPLES = buildSamples;
+  } // lib.attrsets.prefixAttrsNameWith "SUPPORT_" {
+    HIP = true;
+    OMP = true;
+    MPI = true;
+  }) ++ lib.cmakeFeatures ({
+    CMAKE_CXX_COMPILER = "hipcc";
+    ROCM_PATH = toString clr;
+    HIP_ROOT_DIR = toString clr;
+  } // lib.attrsets.prefixAttrsNameWith "CMAKE_INSTALL_" {
     # Manually define CMAKE_INSTALL_<DIR>
     # See: https://github.com/NixOS/nixpkgs/pull/197838
-    "-DCMAKE_INSTALL_BINDIR=bin"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-  ] ++ lib.optionals (gpuTargets != [ ]) [
-    "-DAMDGPU_TARGETS=${lib.strings.concatStringsSep ";" gpuTargets}"
-  ] ++ lib.optionals buildTests [
-    "-DBUILD_CLIENTS_TESTS=ON"
-  ] ++ lib.optionals buildBenchmarks [
-    "-DBUILD_CLIENTS_BENCHMARKS=ON"
-  ];
+    BINDIR = "bin";
+    LIBDIR = "lib";
+    INCLUDEDIR = "include";
+  }) ++ lib.optionals (gpuTargets != [ ]) (lib.cmakeFeatures {
+    AMDGPU_TARGETS = lib.strings.concatStringsSep ";" gpuTargets;
+  });
 
   postInstall = lib.optionalString buildTests ''
     mkdir -p $test/bin

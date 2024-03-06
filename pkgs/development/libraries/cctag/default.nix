@@ -24,15 +24,13 @@ stdenv.mkDerivation rec {
     hash = "sha256-foB+e7BCuUucyhN8FsI6BIT3/fsNLTjY6QmjkMWZu6A=";
   };
 
-  cmakeFlags = [
+  cmakeFlags = lib.cmakeBools {
     # Feel free to create a PR to add CUDA support
-    "-DCCTAG_WITH_CUDA=OFF"
-
-    "-DCCTAG_ENABLE_SIMD_AVX2=${if avx2Support then "ON" else "OFF"}"
-
-    "-DCCTAG_BUILD_TESTS=${if doCheck then "ON" else "OFF"}"
-    "-DCCTAG_BUILD_APPS=OFF"
-  ];
+    CCTAG_WITH_CUDA = false;
+    CCTAG_ENABLE_SIMD_AVX2 = avx2Support;
+    CCTAG_BUILD_TESTS = doCheck;
+    CCTAG_BUILD_APPS = false;
+  };
 
   patches = [
     ./cmake-install-include-dir.patch

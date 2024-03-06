@@ -51,19 +51,20 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  cmakeFlags = [
-    "-DOPEN62541_VERSION=v${finalAttrs.version}"
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
 
-    "-DBUILD_SHARED_LIBS=${if stdenv.hostPlatform.isStatic then "OFF" else "ON"}"
-    "-DUA_NAMESPACE_ZERO=FULL"
-
-    "-DUA_BUILD_UNIT_TESTS=${if finalAttrs.finalPackage.doCheck then "ON" else "OFF"}"
-  ]
-  ++ lib.optional withExamples "-DUA_BUILD_EXAMPLES=ON"
-  ++ lib.optional (withEncryption != false)
-    "-DUA_ENABLE_ENCRYPTION=${lib.toUpper withEncryption}"
-  ++ lib.optional withPubSub "-DUA_ENABLE_PUBSUB=ON"
-  ;
+    UA_BUILD_UNIT_TESTS = finalAttrs.finalPackage.doCheck;
+    UA_BUILD_EXAMPLES = withExamples;
+    UA_ENABLE_PUBSUB = withPubSub;
+  }
+  ++ lib.cmakeFeatures {
+    OPEN62541_VERSION = "v${finalAttrs.version}";
+    UA_NAMESPACE_ZERO = "FULL";
+  }
+  ++ lib.optionals (withEncryption != false) (lib.cmakeFeatures {
+    UA_ENABLE_ENCRYPTION = (lib.toUpper withEncryption);
+  });
 
   nativeBuildInputs = [
     cmake

@@ -30,11 +30,13 @@ stdenv.mkDerivation rec {
     boost
   ];
 
-  cmakeFlags = lib.optional enableShared "-DBUILD_STATIC_AND_SHARED=ON"
-    ++ [ "-DFAT_RUNTIME=${if stdenv.hostPlatform.isLinux then "ON" else "OFF"}" ]
-    ++ lib.optional stdenv.hostPlatform.avx2Support "-DBUILD_AVX2=ON"
-    ++ lib.optional stdenv.hostPlatform.avx512Support "-DBUILD_AVX512=ON"
-  ;
+  cmakeFlags = lib.cmakeBools ({
+    FAT_RUNTIME =  stdenv.hostPlatform.isLinux;
+  } // lib.attrsets.prefixAttrsNameWith "BUILD_" {
+    STATIC_AND_SHARED = enableShared;
+    AVX2 = stdenv.hostPlatform.avx2Support;
+    AVX512N = stdenv.hostPlatform.avx512Support;
+  });
 
   meta = with lib; {
     description = "A portable fork of the high-performance regular expression matching library";

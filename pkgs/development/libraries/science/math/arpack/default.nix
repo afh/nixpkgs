@@ -32,11 +32,12 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DINTERFACE64=${if blas.isILP64 then "1" else "0"}"
-    "-DMPI=${if useMpi then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = true;
+    MPI = useMpi;
+  } ++ lib.cmakeFeatures {
+    INTERFACE64 = if blas.isILP64 then "1" else "0";
+  };
 
   preCheck = ''
     # Prevent tests from using all cores

@@ -30,9 +30,9 @@ stdenv.mkDerivation rec {
     cmake
   ];
 
-  cmakeFlags = [
-    "-DWITH_SYSTEMD=${if withSystemd then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    WITH_SYSTEMD = withSystemd;
+  };
 
   buildInputs = [
     libjpeg

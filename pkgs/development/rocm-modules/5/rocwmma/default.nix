@@ -55,23 +55,23 @@ stdenv.mkDerivation (finalAttrs: {
     rocblas
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_CXX_COMPILER=hipcc"
-    "-DROCWMMA_BUILD_TESTS=${if buildTests || buildBenchmarks then "ON" else "OFF"}"
-    "-DROCWMMA_BUILD_SAMPLES=${if buildSamples then "ON" else "OFF"}"
+  cmakeFlags = lib.cmakeFeatures ({
+    CMAKE_CXX_COMPILER = "hipcc";
+  } // lib.attrsets.prefixAttrsNameWith "CMAKE_INSTALL_" {
     # Manually define CMAKE_INSTALL_<DIR>
     # See: https://github.com/NixOS/nixpkgs/pull/197838
-    "-DCMAKE_INSTALL_BINDIR=bin"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-  ] ++ lib.optionals (gpuTargets != [ ]) [
-    "-DGPU_TARGETS=${lib.concatStringsSep ";" gpuTargets}"
-  ] ++ lib.optionals buildExtendedTests [
-    "-DROCWMMA_BUILD_EXTENDED_TESTS=ON"
-  ] ++ lib.optionals buildBenchmarks [
-    "-DROCWMMA_BUILD_BENCHMARK_TESTS=ON"
-    "-DROCWMMA_BENCHMARK_WITH_ROCBLAS=ON"
-  ];
+    BINDIR = "bin";
+    LIBDIR = "lib";
+    INCLUDEDIR = "include";
+  }) ++ lib.cmakeBools {
+    ROCWMMA_BUILD_TESTS = (buildTests || buildBenchmarks);
+    ROCWMMA_BUILD_SAMPLES = buildSamples;
+    ROCWMMA_BUILD_EXTENDED_TESTS = buildExtendedTests;
+    ROCWMMA_BUILD_BENCHMARK_TESTS = buildBenchmarks;
+    ROCWMMA_BENCHMARK_WITH_ROCBLAS = buildBenchmarks;
+  } ++ lib.optionals (gpuTargets != [ ]) (lib.cmakeFeatures {
+    GPU_TARGETS = lib.concatStringsSep ";" gpuTargets;
+  });
 
   postInstall = lib.optionalString (buildTests || buildBenchmarks) ''
     mkdir -p $test/bin

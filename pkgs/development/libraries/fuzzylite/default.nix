@@ -31,10 +31,10 @@ stdenv.mkDerivation rec {
     ninja
   ];
 
-  cmakeFlags = [
-    "-DFL_BUILD_TESTS:BOOL=OFF"
-    "-DFL_USE_FLOAT:BOOL=${if useFloat then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    FL_BUILD_TESTS = false;
+    FL_USE_FLOAT = useFloat;
+  };
 
   meta = with lib; {
     description = "A fuzzy logic control library in C++";

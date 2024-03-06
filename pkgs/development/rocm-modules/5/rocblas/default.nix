@@ -113,33 +113,34 @@ in stdenv.mkDerivation (finalAttrs: {
     python3Packages.pyyaml
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_C_COMPILER=hipcc"
-    "-DCMAKE_CXX_COMPILER=hipcc"
-    "-Dpython=python3"
-    "-DAMDGPU_TARGETS=${lib.concatStringsSep ";" gpuTargets}"
-    "-DBUILD_WITH_TENSILE=${if buildTensile then "ON" else "OFF"}"
+  cmakeFlags = lib.cmakeFeatures ({
+    CMAKE_C_COMPILER = "hipcc";
+    CMAKE_CXX_COMPILER = "hipcc";
+    python = "python3";
+    AMDGPU_TARGETS = lib.concatStringsSep ";" gpuTargets;
+  } // lib.attrsets.prefixAttrsNameWith "CMAKE_INSTALL_" {
     # Manually define CMAKE_INSTALL_<DIR>
     # See: https://github.com/NixOS/nixpkgs/pull/197838
-    "-DCMAKE_INSTALL_BINDIR=bin"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DCMAKE_INSTALL_INCLUDEDIR=include"
-  ] ++ lib.optionals buildTensile [
-    "-DVIRTUALENV_HOME_DIR=/build/source/tensile"
-    "-DTensile_TEST_LOCAL_PATH=/build/source/tensile"
-    "-DTensile_ROOT=/build/source/tensile/${python3.sitePackages}/Tensile"
-    "-DTensile_LOGIC=${tensileLogic}"
-    "-DTensile_CODE_OBJECT_VERSION=${tensileCOVersion}"
-    "-DTensile_SEPARATE_ARCHITECTURES=${if tensileSepArch then "ON" else "OFF"}"
-    "-DTensile_LAZY_LIBRARY_LOADING=${if tensileLazyLib then "ON" else "OFF"}"
-    "-DTensile_LIBRARY_FORMAT=${tensileLibFormat}"
-  ] ++ lib.optionals buildTests [
-    "-DBUILD_CLIENTS_TESTS=ON"
-  ] ++ lib.optionals buildBenchmarks [
-    "-DBUILD_CLIENTS_BENCHMARKS=ON"
-  ] ++ lib.optionals (buildTests || buildBenchmarks) [
-    "-DCMAKE_CXX_FLAGS=-I${amd-blis}/include/blis"
-  ];
+    BINDIR = "bin";
+    LIBDIR = "lib";
+    INCLUDEDIR = "include";
+  }) ++ lib.cmakeBools {
+    BUILD_WITH_TENSILE = buildTensile;
+    BUILD_CLIENTS_TESTS = buildTests;
+    BUILD_CLIENTS_BENCHMARKS = buildBenchmarks;
+  } ++ lib.optionals buildTensile (lib.cmakeFeatures {
+    VIRTUALENV_HOME_DIR = "/build/source/tensile";
+    Tensile_TEST_LOCAL_PATH = "/build/source/tensile";
+    Tensile_ROOT = "/build/source/tensile/${python3.sitePackages}/Tensile";
+    Tensile_LOGIC = tensileLogic;
+    Tensile_CODE_OBJECT_VERSION = tensileCOVersion;
+    Tensile_LIBRARY_FORMAT = toString tensileLibFormat;
+  } ++ lib.cmakeBools {
+    Tensile_SEPARATE_ARCHITECTURES = tensileSepArch;
+    Tensile_LAZY_LIBRARY_LOADING = tensileLazyLib;
+  }) ++ lib.optionals (buildTests || buildBenchmarks) (lib.cmakeFeatures {
+    CMAKE_CXX_FLAGS = "-I${amd-blis}/include/blis";
+  });
 
   postPatch = lib.optionalString (finalAttrs.pname != "rocblas") ''
     # Return early and install tensile files manually

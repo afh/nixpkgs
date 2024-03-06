@@ -12,11 +12,6 @@
 , AVFoundation, Cocoa, QTKit, Accelerate
 }:
 
-let
-  opencvFlag = name: enabled: "-DWITH_${name}=${if enabled then "ON" else "OFF"}";
-
-in
-
 stdenv.mkDerivation rec {
   pname = "opencv";
   version = "2.4.13.7";
@@ -58,13 +53,16 @@ stdenv.mkDerivation rec {
 
   env.NIX_CFLAGS_COMPILE = lib.optionalString enableEXR "-I${ilmbase.dev}/include/OpenEXR";
 
-  cmakeFlags = [
-    (opencvFlag "TIFF" enableTIFF)
-    (opencvFlag "JPEG" enableJPEG)
-    (opencvFlag "PNG" enablePNG)
-    (opencvFlag "OPENEXR" enableEXR)
-    (opencvFlag "GSTREAMER" enableGStreamer)
-  ] ++ lib.optional (!enableUnfree) "-DBUILD_opencv_nonfree=OFF";
+  cmakeFlags = lib.cmakeBools {
+    BUILD_opencv_nonfree = !enableUnfree;
+  }
+  // (lib.attrsets.prefixAttrsNameWith "WITH_" {
+    TIFF = enableTIFF;
+    JPEG = enableJPEG;
+    PNG = enablePNG;
+    OPENEXR = enableEXR;
+    GSTREAMER = enableGStreamer;
+  });
 
   hardeningDisable = [ "bindnow" "relro" ];
 

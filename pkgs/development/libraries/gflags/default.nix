@@ -18,10 +18,11 @@ stdenv.mkDerivation rec {
   # This isn't used by the build and breaks the CMake build on case-insensitive filesystems (e.g., on Darwin)
   preConfigure = "rm BUILD";
 
-  cmakeFlags = [
-    "-DGFLAGS_BUILD_SHARED_LIBS=${if enableShared then "ON" else "OFF"}"
-    "-DGFLAGS_BUILD_STATIC_LIBS=ON"
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "GFLAGS_BUILD_" {
+    SHARED_LIBS = enableShared;
+    BUILD_STATIC_LIBS = false;
+  });
 
   doCheck = false;
 

@@ -26,10 +26,11 @@ stdenv.mkDerivation rec {
   # HACK `propagatedSandboxProfile` does not appear to actually propagate the sandbox profile from `qtbase`
   sandboxProfile = toString qtbase.__propagatedSandboxProfile or null;
 
-  cmakeFlags = [
-    "-DBUILD_WITH_QT6=${if lib.versions.major qtbase.version == "6" then "ON" else "OFF"}"
-    "-DQT_TRANSLATIONS_DIR=share/qt/translations"
-  ];
+  cmakeFlags = lib.cmakeBool ({
+    BUILD_WITH_QT6 = (lib.versions.major qtbase.version == "6");
+  } // lib.cmakeFeatures {
+    QT_TRANSLATIONS_DIR = "share/qt/translations";
+  });
 
   nativeBuildInputs = [ cmake ]
     ++ lib.optionals (!stdenv.isDarwin) [ pkg-config ] # for finding libsecret

@@ -25,9 +25,9 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ninja ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-  ] ++ lib.optionals (
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !static;
+  } ++ lib.optionals (
     (stdenv.cc.isGNU && (lib.versionOlder stdenv.cc.version "11.0"))
     || (stdenv.cc.isClang && (lib.versionOlder stdenv.cc.version "16.0"))
   ) [

@@ -33,9 +33,10 @@ stdenv.mkDerivation rec {
     substituteInPlace config/template.pc \
       --replace "\''${prefix}/" ""
   '';
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if stdenv.hostPlatform.isStatic then "OFF" else "ON"}"
-  ];
+
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+  };
 
   doCheck = true;
   preCheck = ''

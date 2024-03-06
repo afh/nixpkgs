@@ -46,11 +46,12 @@ stdenv.mkDerivation rec {
     ++ lib.optional jackSupport jack
     ++ lib.optionals coremidiSupport [ CoreMIDI CoreAudio CoreServices ];
 
-  cmakeFlags = [
-    "-DRTMIDI_API_ALSA=${if alsaSupport then "ON" else "OFF"}"
-    "-DRTMIDI_API_JACK=${if jackSupport then "ON" else "OFF"}"
-    "-DRTMIDI_API_CORE=${if coremidiSupport then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "RTMIDI_API_" {
+    ALSA = alsaSupport;
+    JACK = jackSupport;
+    CORE = coremidiSupport;
+  });
 
   meta = with lib; {
     description = "A set of C++ classes that provide a cross platform API for realtime MIDI input/output";

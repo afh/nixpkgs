@@ -38,18 +38,19 @@ stdenv.mkDerivation (finalAttrs: {
     zstd
   ];
 
-  cmakeFlags = [
-    "-DBUILD_STATIC=${if static then "ON" else "OFF"}"
-    "-DBUILD_SHARED=${if static then "OFF" else "ON"}"
-
-    "-DPREFER_EXTERNAL_LZ4=ON"
-    "-DPREFER_EXTERNAL_ZLIB=ON"
-    "-DPREFER_EXTERNAL_ZSTD=ON"
-
-    "-DBUILD_EXAMPLES=OFF"
-    "-DBUILD_BENCHMARKS=OFF"
-    "-DBUILD_TESTS=${if finalAttrs.finalPackage.doCheck then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "BUILD_" {
+    STATIC = static;
+    SHARED = !static;
+    TESTS = finalAttrs.finalPackage.doCheck;
+    EXAMPLES = false;
+    BENCHMARKS = false;
+  }
+  // lib.attrsets.prefixAttrsNameWith "PREFER_EXTERNAL_" {
+    LZ4 = true;
+    ZLIB = true;
+    ZSTD = true;
+  });
 
   doCheck = !static;
 

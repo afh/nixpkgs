@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = lib.optionals enableOpenMP [ llvmPackages.openmp ];
 
-  cmakeFlags = [ "-DOPENMP=${if enableOpenMP then "ON" else "OFF"}" ];
+  cmakeFlags = lib.cmakeBools { OPENMP = enableOpenMP; };
 
   meta = with lib; {
     description = "Wavefront alignment algorithm library v2";

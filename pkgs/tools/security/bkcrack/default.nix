@@ -20,9 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [ cmake ];
 
-  cmakeFlags = [
-    "-DBKCRACK_BUILD_TESTING=${if finalAttrs.doCheck then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools { BKCRACK_BUILD_TESTING = finalAttrs.doCheck; };
 
   postInstall = ''
     mkdir -p $out/bin $out/share/doc/bkcrack $out/share/licenses/bkcrack

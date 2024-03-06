@@ -34,10 +34,10 @@ mkDerivation rec {
 
   hardeningDisable = [ "stackprotector" ];
 
-  cmakeFlags = [
-    "-DSC_WII=OFF"
-    "-DSC_EL=${if useSCEL then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    SC_WII = false;
+    SC_EL = useSCEL;
+  };
 
   passthru = {
     updateScript = gitUpdater {

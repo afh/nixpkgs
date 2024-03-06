@@ -22,11 +22,11 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
   buildInputs = [ openssl ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if enableStatic then "OFF" else "ON"}"
-    "-DOQS_DIST_BUILD=ON"
-    "-DOQS_BUILD_ONLY_LIB=ON"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !enableStatic;
+    OQS_DIST_BUILD = true;
+    OQS_BUILD_ONLY_LIB = true;
+  };
 
   dontFixCmake = true; # fix CMake file will give an error
 

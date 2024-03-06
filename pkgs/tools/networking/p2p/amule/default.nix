@@ -56,18 +56,20 @@ stdenv.mkDerivation rec {
   ] ++ lib.optional httpServer libpng
   ++ lib.optional client libX11;
 
-  cmakeFlags = [
-    "-DBUILD_MONOLITHIC=${if monolithic then "ON" else "OFF"}"
-    "-DBUILD_DAEMON=${if enableDaemon then "ON" else "OFF"}"
-    "-DBUILD_REMOTEGUI=${if client then "ON" else "OFF"}"
-    "-DBUILD_WEBSERVER=${if httpServer then "ON" else "OFF"}"
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "BUILD_" {
+    MONOLITHIC = monolithic;
+    DAEMON = enableDaemon;
+    REMOTEGUI = client;
+    WEBSERVER = httpServer;
+  } // lib.attrsets.prefixAttrsNameWith "wx_NEED_" {
     # building only the daemon fails when these are not set... this is
     # due to mistakes in the Amule cmake code, but it does not cause
     # extra code to be built...
-    "-Dwx_NEED_GUI=ON"
-    "-Dwx_NEED_ADV=ON"
-    "-Dwx_NEED_NET=ON"
-  ];
+    GUI = true;
+    ADV = true;
+    NET = true;
+  });
 
   postPatch = ''
     echo "find_package(Threads)" >> cmake/options.cmake

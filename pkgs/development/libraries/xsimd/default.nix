@@ -40,9 +40,9 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
-  cmakeFlags = [
-    "-DBUILD_TESTS=${if (finalAttrs.finalPackage.doCheck && stdenv.hostPlatform == stdenv.buildPlatform) then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_TESTS = (finalAttrs.finalPackage.doCheck && stdenv.hostPlatform == stdenv.buildPlatform);
+  };
 
   doCheck = true;
   nativeCheckInputs = [

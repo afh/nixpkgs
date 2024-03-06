@@ -34,11 +34,11 @@ stdenv.mkDerivation rec {
   buildFlags = [ "all" ];
 
   # NOTE: disabling tests due to gtest issue
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-    "-DLEVELDB_BUILD_TESTS=OFF"
-    "-DLEVELDB_BUILD_BENCHMARKS=OFF"
-  ];
+  cmakeFlags = lib.cmakeBolls {
+    BUILD_SHARED_LIBS =!static;
+    LEVELDB_BUILD_TESTS = false;
+    LEVELDB_BUILD_BENCHMARKS = false;
+  };
 
   postInstall = ''
     substituteInPlace "$out"/lib/cmake/leveldb/leveldbTargets.cmake \

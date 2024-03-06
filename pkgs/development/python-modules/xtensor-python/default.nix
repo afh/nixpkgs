@@ -30,9 +30,9 @@ toPythonModule (stdenv.mkDerivation(finalAttrs: {
     gtest
   ];
   doCheck = true;
-  cmakeFlags = [
-    "-DBUILD_TESTS=${if finalAttrs.finalPackage.doCheck then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_TESTS = finalAttrs.finalPackage.doCheck;
+  };
 
   propagatedBuildInputs = [
     xtensor

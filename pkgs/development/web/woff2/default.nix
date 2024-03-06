@@ -20,10 +20,11 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake pkg-config ];
 
-  cmakeFlags = [
-    "-DCANONICAL_PREFIXES=ON"
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-  ] ++ lib.optional static "-DCMAKE_SKIP_RPATH:BOOL=TRUE";
+  cmakeFlags = lib.cmakeBools {
+    CANONICAL_PREFIXES = true;
+    BUILD_SHARED_LIBS = !static;
+    CMAKE_SKIP_RPATH = static;
+  };
 
   propagatedBuildInputs = [ brotli ];
 

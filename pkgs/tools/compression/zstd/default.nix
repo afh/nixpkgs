@@ -50,15 +50,16 @@ stdenv.mkDerivation rec {
       tests/playTests.sh
   '';
 
-  cmakeFlags = lib.attrsets.mapAttrsToList
-    (name: value: "-DZSTD_${name}:BOOL=${if value then "ON" else "OFF"}") {
-      BUILD_SHARED = !static;
-      BUILD_STATIC = enableStatic;
-      BUILD_CONTRIB = buildContrib;
-      PROGRAMS_LINK_SHARED = !static;
-      LEGACY_SUPPORT = legacySupport;
-      BUILD_TESTS = doCheck;
-    };
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "ZSTD_" {
+    PROGRAMS_LINK_SHARED = !static;
+    LEGACY_SUPPORT = legacySupport;
+  } // lib.attrsets.prefixAttrsNameWith "ZSTD_BUILD_" {
+    SHARED = !static;
+    STATIC = enableStatic;
+    CONTRIB = buildContrib;
+    TESTS = doCheck;
+  });
 
   cmakeDir = "../build/cmake";
   dontUseCmakeBuildDir = true;

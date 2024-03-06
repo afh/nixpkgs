@@ -52,12 +52,12 @@ stdenv.mkDerivation rec {
     pythonPackages.numpy
   ];
 
-  cmakeFlags = [
-    "-DENABLE_PYTHON=${if enablePython then "ON" else "OFF"}"
-    "-DENABLE_PNG=ON"
-    "-DENABLE_ECCODES_THREADS=${if enablePosixThreads then "ON" else "OFF"}"
-    "-DENABLE_ECCODES_OMP_THREADS=${if enableOpenMPThreads then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    ENABLE_PYTHON = enablePython;
+    ENABLE_PNG = false;
+    ENABLE_ECCODES_THREADS = enablePosixThreads;
+    ENABLE_ECCODES_OMP_THREADS = enableOpenMPThreads;
+  };
 
   doCheck = true;
 

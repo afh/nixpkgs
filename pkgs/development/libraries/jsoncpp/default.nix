@@ -36,17 +36,17 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake python3 validatePkgConfig ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DBUILD_OBJECT_LIBS=OFF"
-    "-DJSONCPP_WITH_CMAKE_PACKAGE=ON"
-    "-DBUILD_STATIC_LIBS=${if enableStatic then "ON" else "OFF"}"
-  ]
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = true;
+    BUILD_OBJECT_LIBS = false;
+    JSONCPP_WITH_CMAKE_PACKAGE = true;
+    BUILD_STATIC_LIBS = enableStatic;
     # the test's won't compile if secureMemory is used because there is no
     # comparison operators and conversion functions between
     # std::basic_string<..., Json::SecureAllocator<char>> vs.
     # std::basic_string<..., [default allocator]>
-    ++ lib.optional ((stdenv.buildPlatform != stdenv.hostPlatform) || secureMemory) "-DJSONCPP_WITH_TESTS=OFF";
+    JSONCPP_WITH_TESTS = ((stdenv.buildPlatform != stdenv.hostPlatform) || secureMemory);
+  };
 
   meta = with lib; {
     homepage = "https://github.com/open-source-parsers/jsoncpp";

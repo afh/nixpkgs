@@ -13,11 +13,11 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ];
 
-  cmakeFlags = [
+  cmakeFlags = lib.cmakeBools {
     # networkmanager relies on libjansson.so:
     #   https://github.com/NixOS/nixpkgs/pull/176302#issuecomment-1150239453
-    "-DJANSSON_BUILD_SHARED_LIBS=${if stdenv.hostPlatform.isStatic then "OFF" else "ON"}"
-  ];
+    JANSSON_BUILD_SHARED_LIBS = !stdenv.hostPlatform.isStatic;
+  };
 
   meta = with lib; {
     homepage = "https://github.com/akheron/jansson";

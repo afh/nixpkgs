@@ -51,12 +51,13 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  cmakeFlags = [
-    "-DBUILD_EXAMPLES:BOOL=OFF"
-    "-DBUILD_TESTS:BOOL=OFF"
-    "-DBUILD_MATLAB_BINDINGS:BOOL=OFF"
-    "-DBUILD_PYTHON_BINDINGS:BOOL=${if enablePython then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "BUILD_" {
+    EXAMPLES = false;
+    TESTS = false;
+    MATLAB_BINDINGS = false;
+    PYTHON_BINDINGS = enablePython;
+  });
 
   nativeBuildInputs = [
     cmake

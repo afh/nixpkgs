@@ -35,13 +35,16 @@ stdenv.mkDerivation rec {
     )
   '';
 
-  cmakeFlags = [
-  ] ++ lib.optional enableCfp "-DBUILD_CFP=ON"
-    ++ lib.optional enableCuda "-DZFP_WITH_CUDA=ON"
-    ++ lib.optional enableFortran "-DBUILD_ZFORP=ON"
-    ++ lib.optional enableOpenMP "-DZFP_WITH_OPENMP=ON"
-    ++ lib.optional enablePython "-DBUILD_ZFPY=ON"
-    ++ ([ "-DBUILD_UTILITIES=${if enableUtilities then "ON" else "OFF"}" ]);
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "BUILD_" {
+    CFP = enableCfp;
+    ZFORP = enableFortran;
+    ZFPY = enablePython;
+    UTILITIES = enableUtilities;
+  } // lib.attrsets.prefixAttrsNameWith "ZFP_WITH_" {
+    CUDA = enableCuda;
+    OPENMP = enableOpenMP;
+  });
 
   doCheck = true;
 

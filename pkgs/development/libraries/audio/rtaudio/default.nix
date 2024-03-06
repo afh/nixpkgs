@@ -32,12 +32,13 @@ stdenv.mkDerivation rec {
     ++ lib.optional jackSupport jack
     ++ lib.optional coreaudioSupport CoreAudio;
 
-  cmakeFlags = [
-    "-DRTAUDIO_API_ALSA=${if alsaSupport then "ON" else "OFF"}"
-    "-DRTAUDIO_API_PULSE=${if pulseaudioSupport then "ON" else "OFF"}"
-    "-DRTAUDIO_API_JACK=${if jackSupport then "ON" else "OFF"}"
-    "-DRTAUDIO_API_CORE=${if coreaudioSupport then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "RTAUDIO_API_" {
+    ALSA = alsaSupport;
+    PULSE = pulseaudioSupport;
+    JACK = jackSupport;
+    CORE = coreaudioSupport;
+  });
 
   meta = with lib; {
     description = "A set of C++ classes that provide a cross platform API for realtime audio input/output";

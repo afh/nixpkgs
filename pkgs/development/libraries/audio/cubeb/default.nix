@@ -43,15 +43,14 @@ in stdenv.mkDerivation {
     else backendLibs
   );
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DBUILD_TESTS=OFF" # tests require an audio server
-    "-DBUNDLE_SPEEX=OFF"
-    "-DUSE_SANITIZERS=OFF"
-
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = true;
+    BUILD_TESTS = false; # tests require an audio server
+    BUNDLE_SPEEX = false;
+    USE_SANITIZERS = false;
     # Whether to lazily load libraries with dlopen()
-    "-DLAZY_LOAD_LIBS=${if lazyLoad then "ON" else "OFF"}"
-  ];
+    LAZY_LOAD_LIBS = lazyLoad;
+  };
 
   passthru = {
     # For downstream users when lazyLoad is true

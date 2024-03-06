@@ -24,11 +24,10 @@ stdenv.mkDerivation rec {
     ./cmake-core-foundation.patch
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if static then "OFF" else "ON"}"
-  ] ++ lib.optionals (cxxStandard != null) [
-    "-DCMAKE_CXX_STANDARD=${cxxStandard}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !static;
+    CMAKE_CXX_STANDARD = cxxStandard != null;
+  };
 
   nativeBuildInputs = [ cmake ];
 

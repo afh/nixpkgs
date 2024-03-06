@@ -95,20 +95,22 @@ stdenv.mkDerivation rec {
 
   hardeningDisable = [ "format" ];
 
-  cmakeFlags = [
-    "-DTCAM_BUILD_GST_1_0=ON"
-    "-DTCAM_BUILD_TOOLS=ON"
-    "-DTCAM_BUILD_V4L2=ON"
-    "-DTCAM_BUILD_LIBUSB=ON"
-    "-DTCAM_BUILD_TESTS=ON"
-    "-DTCAM_BUILD_ARAVIS=${if withAravis then "ON" else "OFF"}"
-    "-DTCAM_BUILD_DOCUMENTATION=${if withDoc then "ON" else "OFF"}"
-    "-DTCAM_BUILD_WITH_GUI=${if withGui then "ON" else "OFF"}"
-    "-DTCAM_DOWNLOAD_MESON=OFF"
-    "-DTCAM_INTERNAL_ARAVIS=OFF"
-    "-DTCAM_ARAVIS_USB_VISION=${if withAravis && withAravisUsbVision then "ON" else "OFF"}"
-    "-DTCAM_INSTALL_FORCE_PREFIX=ON"
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "TCAM_BUILD_" {
+    GST_1_0 = true;
+    TOOLS = true;
+    V4L2 = true;
+    LIBUSB = true;
+    TESTS = true;
+    ARAVIS = withAravis;
+    DOCUMENTATION = withDoc;
+    WITH_GUI = withGui;
+  } // lib.attrsets.prefixAttrsNameWith "TCAM_" {
+    DOWNLOAD_MESON = false;
+    INTERNAL_ARAVIS = false;
+    ARAVIS_USB_VISION = withAravis && withAravisUsbVision;
+    INSTALL_FORCE_PREFIX = true;
+  });
 
   doCheck = true;
 

@@ -19,10 +19,11 @@ mkDerivation rec {
   ] ++ lib.optional enableGUI qtbase;
   nativeBuildInputs = [ cmake ];
 
-  cmakeFlags = [
-    "-DDISABLE_FRONTEND=${if enableGUI then "OFF" else "ON"}"
-    "-DLIBUSB_LIBRARY=${libusb1}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    DISABLE_FRONTEND = !enableGUI;
+  } ++ lib.cmakeFeatures {
+    LIBUSB_LIBRARY = toString libusb1;
+  };
 
   preConfigure = ''
     # Give ownership of the Galaxy S USB device to the logged in user.

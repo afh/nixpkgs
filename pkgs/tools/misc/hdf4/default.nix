@@ -72,28 +72,27 @@ stdenv.mkDerivation rec {
     export SZIP_INSTALL=${szip}
   '';
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DHDF4_BUILD_TOOLS=ON"
-    "-DHDF4_BUILD_UTILS=ON"
-    "-DHDF4_BUILD_WITH_INSTALL_NAME=OFF"
-    "-DHDF4_ENABLE_JPEG_LIB_SUPPORT=ON"
-    "-DHDF4_ENABLE_NETCDF=${if netcdfSupport then "ON" else "OFF"}"
-    "-DHDF4_ENABLE_Z_LIB_SUPPORT=ON"
-    "-DJPEG_DIR=${libjpeg}"
-  ] ++ lib.optionals javaSupport [
-    "-DHDF4_BUILD_JAVA=ON"
-    "-DJAVA_HOME=${jdk}"
-  ] ++ lib.optionals szipSupport [
-    "-DHDF4_ENABLE_SZIP_ENCODING=ON"
-    "-DHDF4_ENABLE_SZIP_SUPPORT=ON"
-  ] ++ (if fortranSupport
-  then [
-    "-DHDF4_BUILD_FORTRAN=ON"
-    "-DCMAKE_Fortran_FLAGS=-fallow-argument-mismatch"
-  ]
-  else [ "-DHDF4_BUILD_FORTRAN=OFF" ]
-  );
+  cmakeFlags = lib.cmakeBools ({
+    BUILD_SHARED_LIBS = true;
+  } // lib.attrsets.prefixAttrsNameWith "HDF4_BUILD_" {
+    JAVA = javaSupport;
+    FORTRAN = fortranSupport;
+    TOOLS = true;
+    UTILS = true;
+    WITH_INSTALL_NAME = false;
+  } // lib.attrsets.prefixAttrsNameWith "HDF4_ENABLE_" {
+    JPEG_LIB_SUPPORT = true;
+    NETCDF = netcdfSupport;
+    Z_LIB_SUPPORT = true;
+    SZIP_ENCODING = szipSupport;
+    SZIP_SUPPORT = szipSupport;
+  }) ++ lib.cmakeFeatures {
+    JPEG_DIR = toString libjpeg;
+  } ++ lib.optionals javaSupport (lib.cmakeFeatures {
+    JAVA_HOME = toString jdk;
+  }) ++ lib.optionals fortranSupport (lib.cmakeFeatures {
+    CMAKE_Fortran_FLAGS = "-fallow-argument-mismatch";
+  });
 
   env = lib.optionalAttrs stdenv.cc.isClang {
     NIX_CFLAGS_COMPILE = toString [

@@ -88,15 +88,15 @@ stdenv.mkDerivation {
     pythonPackages.numpy
   ];
 
-  cmakeFlags = [
-    "-DFAISS_ENABLE_GPU=${if cudaSupport then "ON" else "OFF"}"
-    "-DFAISS_ENABLE_PYTHON=${if pythonSupport then "ON" else "OFF"}"
-    "-DFAISS_OPT_LEVEL=${optLevel}"
-  ] ++ lib.optionals cudaSupport [
-    "-DCMAKE_CUDA_ARCHITECTURES=${builtins.concatStringsSep ";" (map dropDot cudaCapabilities)}"
-    "-DCUDAToolkit_INCLUDE_DIR=${cudaJoined}/include"
-  ];
-
+  cmakeFlags = lib.cmakeBools {
+    FAISS_ENABLE_GPU = cudaSupport;
+    FAISS_ENABLE_PYTHON = pythonSupport;
+  } ++ lib.cmakeFeatures {
+    FAISS_OPT_LEVEL = optLevel;
+  } ++ lib.optional cudaSupport (lib.cmakeFeatures {
+    MAKE_CUDA_ARCHITECTURES = (builtins.concatStringsSep ";" (map dropDot cudaCapabilities));
+    UDAToolkit_INCLUDE_DIR = "${cudaJoined}/include";
+  });
 
   # pip wheel->pip install commands copied over from opencv4
 

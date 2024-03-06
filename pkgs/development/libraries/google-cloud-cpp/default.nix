@@ -125,15 +125,16 @@ stdenv.mkDerivation rec {
     gtest
   ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS:BOOL=${if staticOnly then "OFF" else "ON"}"
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !staticOnly;
     # unconditionally build tests to catch linker errors as early as possible
     # this adds a good chunk of time to the build
-    "-DBUILD_TESTING:BOOL=ON"
-    "-DGOOGLE_CLOUD_CPP_ENABLE_EXAMPLES:BOOL=OFF"
-  ] ++ lib.optionals (apis != [ "*" ]) [
-    "-DGOOGLE_CLOUD_CPP_ENABLE=${lib.concatStringsSep ";" apis}"
-  ];
+    BUILD_TESTING = true;
+    GOOGLE_CLOUD_CPP_ENABLE_EXAMPLES = false;
+  }
+  ++ lib.optionals (apis != [ "*" ]) lib.cmakeFeatures {
+    GOOGLE_CLOUD_CPP_ENABLE = lib.concatStringsSep ";" apis;
+  };
 
   requiredSystemFeatures = [ "big-parallel" ];
 

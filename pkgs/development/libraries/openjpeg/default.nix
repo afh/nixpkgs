@@ -6,10 +6,6 @@
 , poppler
 }:
 
-let
-  mkFlag = optSet: flag: "-D${flag}=${if optSet then "ON" else "OFF"}";
-in
-
 stdenv.mkDerivation rec {
   pname = "openjpeg";
   version = "2.5.0";
@@ -38,17 +34,20 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  cmakeFlags = [
-    "-DCMAKE_INSTALL_NAME_DIR=\${CMAKE_INSTALL_PREFIX}/lib"
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DBUILD_CODEC=ON"
-    "-DBUILD_THIRDPARTY=OFF"
-    (mkFlag jpipLibSupport "BUILD_JPIP")
-    (mkFlag jpipServerSupport "BUILD_JPIP_SERVER")
-    "-DBUILD_VIEWER=OFF"
-    "-DBUILD_JAVA=OFF"
-    (mkFlag doCheck "BUILD_TESTING")
-  ];
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "BUILD_" {
+    SHARED_LIBS = true;
+    CODEC = true;
+    THIRDPARTY = false;
+    JPIP = jpipLibSupport;
+    JPIP_SERVER = jpipServerSupport;
+    VIEWER = false;
+    JAVA = false;
+    TESTING = doCheck;
+  })
+  ++ lib.cmakeFeatures {
+    CMAKE_INSTALL_NAME_DIR = "\${CMAKE_INSTALL_PREFIX}/lib";
+  };
 
   nativeBuildInputs = [ cmake pkg-config ];
 

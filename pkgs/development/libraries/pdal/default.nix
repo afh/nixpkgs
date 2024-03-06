@@ -70,29 +70,31 @@ stdenv.mkDerivation (finalAttrs: {
     libe57format
   ];
 
-  cmakeFlags = [
-    "-DBUILD_PLUGIN_E57=${if enableE57 then "ON" else "OFF"}"
-    "-DBUILD_PLUGIN_HDF=ON"
-    "-DBUILD_PLUGIN_PGPOINTCLOUD=ON"
-    "-DBUILD_PLUGIN_TILEDB=ON"
-    "-DWITH_COMPLETION=ON"
-    "-DWITH_TESTS=ON"
-    "-DBUILD_PGPOINTCLOUD_TESTS=OFF"
+  cmakeFlags = lib.cmakeBools ({
+    WITH_COMPLETION = true;
+    WITH_TESTS = true;
+    BUILD_PGPOINTCLOUD_TESTS = false;
+  }
+  // lib.attrsets.prefixAttrsNameWith "BUILD_PLUGIN_" {
+    E57 = enableE57;
+    HDF = true;
+    PGPOINTCLOUD = true;
+    TILEDB = true;
 
     # Plugins can probably not be made work easily:
-    "-DBUILD_PLUGIN_CPD=OFF"
-    "-DBUILD_PLUGIN_FBX=OFF" # Autodesk FBX SDK is gratis+proprietary; not packaged in nixpkgs
-    "-DBUILD_PLUGIN_GEOWAVE=OFF"
-    "-DBUILD_PLUGIN_I3S=OFF"
-    "-DBUILD_PLUGIN_ICEBRIDGE=OFF"
-    "-DBUILD_PLUGIN_MATLAB=OFF"
-    "-DBUILD_PLUGIN_MBIO=OFF"
-    "-DBUILD_PLUGIN_MRSID=OFF"
-    "-DBUILD_PLUGIN_NITF=OFF"
-    "-DBUILD_PLUGIN_OCI=OFF"
-    "-DBUILD_PLUGIN_RDBLIB=OFF" # Riegl rdblib is proprietary; not packaged in nixpkgs
-    "-DBUILD_PLUGIN_RIVLIB=OFF"
-  ];
+    CPD = false;
+    FBX = false; # Autodesk FBX SDK is gratis+proprietary; not packaged in nixpkgs
+    GEOWAVE = false;
+    I3S = false;
+    ICEBRIDGE = false;
+    MATLAB = false;
+    MBIO = false;
+    MRSID = false;
+    NITF = false;
+    OCI = false;
+    RDBLIB = false; # Riegl rdblib is proprietary; not packaged in nixpkgs
+    RIVLIB = false;
+  });
 
   doCheck = true;
 

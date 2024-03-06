@@ -36,14 +36,14 @@ stdenv.mkDerivation rec {
       --replace "ImGuiKey_KeyPadEnter" "ImGuiKey_KeypadEnter"
   '';
 
-  cmakeFlags = [
-    "-DEMSCRIPTEN:BOOL=${if withEmscripten then "ON" else "OFF"}"
-    "-DIMTUI_SUPPORT_CURL:BOOL=${if withCurl then "ON" else "OFF"}"
-    "-DIMTUI_SUPPORT_NCURSES:BOOL=${if withNcurses then "ON" else "OFF"}"
-    "-DBUILD_SHARED_LIBS:BOOL=${if (!static) then "ON" else "OFF"}"
-    "-DIMTUI_BUILD_EXAMPLES:BOOL=OFF"
-    "-DIMTUI_INSTALL_IMGUI_HEADERS:BOOL=OFF"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    EMSCRIPTEN = withEmscripten;
+    IMTUI_SUPPORT_CURL = withCurl;
+    IMTUI_SUPPORT_NCURSES = withNcurses;
+    BUILD_SHARED_LIBS = !static;
+    IMTUI_BUILD_EXAMPLES = false;
+    IMTUI_INSTALL_IMGUI_HEADERS = false;
+  };
 
   postInstall = ''
     rm -rf $out/include/imgui

@@ -33,9 +33,9 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [ eigen glog ]
   ++ lib.optionals withBlas [ blas suitesparse metis ];
 
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=${if enableStatic then "OFF" else "ON"}"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SHARED_LIBS = !enableStatic;
+  };
 
   # The Basel BUILD file conflicts with the cmake build directory on
   # case-insensitive filesystems, eg. darwin.

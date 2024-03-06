@@ -44,11 +44,12 @@ stdenv.mkDerivation (finalAttrs: {
     libclang
   ];
 
-  cmakeFlags = [
-    "-DCLANG_RESOURCE_DIR=${libclang.dev}/"
-    "-DSPHINX_HTML=${if withHTML then "ON" else "OFF"}"
-    "-DSPHINX_MAN=${if withManual then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeFeatures {
+    CLANG_RESOURCE_DIR = "${libclang.dev}/";
+  } ++ lib.cmakeBools {
+    SPHINX_HTML = withHTML;
+    SPHINX_MAN = withManual;
+  };
 
   # 97% tests passed, 97 tests failed out of 2881
   # mostly because it checks command line and nix append -isystem and all

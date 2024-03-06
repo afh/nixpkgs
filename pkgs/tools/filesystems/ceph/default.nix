@@ -377,11 +377,12 @@ in rec {
       patchShebangs src/
     '';
 
-    cmakeFlags = [
-      "-DCMAKE_INSTALL_DATADIR=${placeholder "lib"}/lib"
-
-      "-DWITH_CEPHFS_SHELL:BOOL=ON"
-      "-DWITH_SYSTEMD:BOOL=OFF"
+    cmakeFlags = lib.cmakeFeatures {
+      CMAKE_INSTALL_DATADIR = placeholder "lib" + "/lib";
+    } ++ lib.cmakeBools
+    (lib.attrsets.prefixAttrsNameWith "WITH_" {
+      CEPHFS_SHELL = true;
+      SYSTEMD = false;
       # `WITH_JAEGER` requires `thrift` as a depenedncy (fine), but the build fails with:
       #     CMake Error at src/opentelemetry-cpp-stamp/opentelemetry-cpp-build-Release.cmake:49 (message):
       #     Command failed: 2
@@ -400,22 +401,23 @@ in rec {
       # But the relevant code is already removed in `open-telemetry` 1.10: https://github.com/open-telemetry/opentelemetry-cpp/pull/2031
       # So it's proably not worth trying to fix that for this Ceph version,
       # and instead just disable Ceph's Jaeger support.
-      "-DWITH_JAEGER:BOOL=OFF"
-      "-DWITH_TESTS:BOOL=OFF"
+      JAEGER = false;
+      TESTS = false;
 
       # Use our own libraries, where possible
-      "-DWITH_SYSTEM_ARROW:BOOL=ON" # Only used if other options enable Arrow support.
-      "-DWITH_SYSTEM_BOOST:BOOL=ON"
-      "-DWITH_SYSTEM_GTEST:BOOL=ON"
-      "-DWITH_SYSTEM_ROCKSDB:BOOL=ON"
-      "-DWITH_SYSTEM_UTF8PROC:BOOL=ON"
-      "-DWITH_SYSTEM_ZSTD:BOOL=ON"
+      SYSTEM_ARROW = true; # Only used if other options enable Arrow support.
+      SYSTEM_BOOST = true;
+      SYSTEM_GTEST = true;
+      SYSTEM_ROCKSDB = true;
+      SYSTEM_UTF8PROC = true;
+      SYSTEM_ZSTD = true;
 
       # TODO breaks with sandbox, tries to download stuff with npm
-      "-DWITH_MGR_DASHBOARD_FRONTEND:BOOL=OFF"
+      MGR_DASHBOARD_FRONTEND = false;
       # WITH_XFS has been set default ON from Ceph 16, keeping it optional in nixpkgs for now
-      ''-DWITH_XFS=${if optLibxfs != null then "ON" else "OFF"}''
-    ] ++ lib.optional stdenv.isLinux "-DWITH_SYSTEM_LIBURING=ON";
+      XFS = (optLibxfs != null);
+      SYSTEM_LIBURING = stdenv.isLinux;
+    });
 
     postFixup = ''
       wrapPythonPrograms

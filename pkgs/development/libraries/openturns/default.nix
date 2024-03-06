@@ -58,14 +58,15 @@ stdenv.mkDerivation rec {
     python3Packages.dill
   ] ++ lib.optional stdenv.isDarwin Accelerate;
 
-  cmakeFlags = [
-    "-DOPENTURNS_SYSCONFIG_PATH=$out/etc"
-    "-DCMAKE_UNITY_BUILD=ON"
-    "-DCMAKE_UNITY_BUILD_BATCH_SIZE=32"
-    "-DSWIG_COMPILE_FLAGS='-O1'"
-    "-DUSE_SPHINX=${if enablePython then "ON" else "OFF"}"
-    "-DBUILD_PYTHON=${if enablePython then "ON" else "OFF"}"
-  ];
+  cmakeFlags = lib.cmakeFeatures {
+    OPENTURNS_SYSCONFIG_PATH = "$out/etc";
+    CMAKE_UNITY_BUILD_BATCH_SIZE = "32";
+    SWIG_COMPILE_FLAGS = "-O1";
+  } ++ lib.cmakeBools {
+    CMAKE_UNITY_BUILD = true;
+    USE_SPHINX = enablePython;
+    BUILD_PYTHON = enablePython;
+  };
 
   doCheck = runTests;
 

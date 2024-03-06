@@ -27,11 +27,11 @@ stdenv.mkDerivation rec {
   ];
   nativeCheckInputs = [ gtest ];
 
-  cmakeFlags = [
-    "-DBUILD_SAMPLES=OFF"
-    "-DBUILD_TESTS=${if doCheck then "ON" else "OFF"}"
-    "-DUSE_SYSTEM_GTEST=ON"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    BUILD_SAMPLES = false;
+    BUILD_TESTS = doCheck;
+    USE_SYSTEM_GTEST = true;
+  };
 
   doCheck = true;
 

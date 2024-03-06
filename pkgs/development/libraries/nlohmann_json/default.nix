@@ -23,11 +23,16 @@ in stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [ cmake ];
 
-  cmakeFlags = [
-    "-DJSON_BuildTests=${if finalAttrs.finalPackage.doCheck then "ON" else "OFF"}"
-    "-DJSON_FastTests=ON"
-    "-DJSON_MultipleHeaders=ON"
-  ] ++ lib.optional finalAttrs.finalPackage.doCheck "-DJSON_TestDataDirectory=${testData}";
+  cmakeFlags = lib.cmakeBools
+  (lib.attrsets.prefixAttrsNameWith "JSON_" {
+    BuildTests = finalAttrs.finalPackage.doCheck;
+    FastTests = true;
+    MultipleHeaders = true;
+  })
+  ++ lib.optionals finalAttrs.finalPackage.doCheck lib.cmakeFeatures
+  (lib.attrsets.prefixAttrsNameWith "JSON_" {
+    TestDataDirectory = "${testData}";
+  });
 
   doCheck = stdenv.hostPlatform == stdenv.buildPlatform;
 

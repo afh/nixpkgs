@@ -49,10 +49,10 @@ stdenv.mkDerivation rec {
       --replace 'WLR_PROTOCOL_DIR "/usr' 'WLR_PROTOCOL_DIR "${wlr-protocols}'
   '';
 
-  cmakeFlags = [
-    "-DINSTALL_EXAMPLE_SCRIPTS=${if installExampleScripts then "ON" else "OFF"}"
-    "-DINSTALL_DOCUMENTATION=ON"
-  ];
+  cmakeFlags = lib.cmakeBools {
+    INSTALL_EXAMPLE_SCRIPTS = installExampleScripts;
+    INSTALL_DOCUMENTATION = true;
+  };
 
   postInstall = lib.optionalString installExampleScripts ''
     wrapProgram $out/bin/wl-present --prefix PATH ":" ${wl-present-binpath}

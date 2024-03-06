@@ -13,14 +13,14 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ cmake ];
 
-  cmakeFlags = [
+  cmakeFlags = lib.cmakeBools {
     # If this package is built with clang it will attempt to
     # use libcxx via the Cmake find_package interface.
     # The default libcxx stdenv in llvmPackages doesn't provide
     # this and so will fail.
-    "-DENABLE_LIBCXX=${if libcxxCmakeModule then "ON" else "OFF"}"
-    "-DCPPTOML_BUILD_EXAMPLES=OFF"
-  ];
+    ENABLE_LIBCXX = libcxxCmakeModule;
+    CPPTOML_BUILD_EXAMPLES = false;
+  };
 
   meta = with lib; {
     description = "C++ TOML configuration library";
