@@ -106,7 +106,8 @@ let
       upperChars toLower toUpper addContextFrom splitString
       removePrefix removeSuffix versionOlder versionAtLeast
       getName getVersion
-      cmakeOptionType cmakeBool cmakeFeature
+      cmakeOptionType cmakeBool cmakeBools cmakeFeature cmakeFeatures
+      cmakeUnset cmakeUnsets
       mesonOption mesonBool mesonEnable
       nameFromURL enableFeature enableFeatureAs withFeature
       withFeatureAs fixedWidthString fixedWidthNumber

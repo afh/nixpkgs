@@ -778,7 +778,7 @@ rec {
     assert (isString value);
     "-D${feature}:${toUpper type}=${value}";
 
-  /* Create a -D<condition>={TRUE,FALSE} string that can be passed to typical
+  /* Create a -D<condition>:BOOL={TRUE,FALSE} string that can be passed to typical
      CMake invocations.
 
     Type: cmakeBool :: string -> bool -> string
@@ -788,12 +788,61 @@ rec {
 
      Example:
        cmakeBool "ENABLE_STATIC_LIBS" false
-       => "-DENABLESTATIC_LIBS:BOOL=FALSE"
+       => "-DENABLE_STATIC_LIBS:BOOL=FALSE"
   */
   cmakeBool = condition: flag:
     assert (lib.isString condition);
     assert (lib.isBool flag);
     cmakeOptionType "bool" condition (lib.toUpper (lib.boolToString flag));
+
+  /* Create an array of -D<condition>:BOOL={TRUE,FALSE} strings that can be passed to typical
+     CMake invocations.
+
+    Type: cmakeBools :: string -> AttrSet -> [string]
+
+     @param condition The condition to be made true or false
+     @param flag The controlling flag of the condition
+
+     Example:
+       cmakeBools {
+        ENABLE_STATIC_LIBS = false;
+        ENABLE_SHARED_LIBS = true;
+      }
+       => [ "-DENABLE_STATIC_LIBS:BOOL=FALSE" "-DENABLE_SHARED_LIBS:BOOL=TRUE" ]
+  */
+  cmakeBools = flags:
+    assert (lib.isAttrs flags);
+    lib.attrsets.mapAttrsToList cmakeBool flags;
+
+  /* Create a -U<condition> string that can be passed to typical
+     CMake invocations.
+
+    Type: cmakeUnst :: string -> string
+
+     @param condition The condition to unset
+
+     Example:
+       cmakeUnset "CMAKE_INSTALL_LIBDIR"
+       => "-UCMAKE_INSTALL_LIBDIR"
+  */
+  cmakeUnset = feature:
+    assert (lib.isString feature);
+    "-U${feature}";
+
+  /* Create an array of -U<condition> strings that can be passed to typical
+     CMake invocations.
+
+    Type: cmakeUnsets :: string -> [string]
+
+     @param condition The condition to be made true or false
+
+     Example:
+       cmakeUnsets [ "CMAKE_INSTALL_LIBDIR" "CLANG_RESOURCE_DIR" ]
+       => [ "-UCMAKE_INSTALL_LIBDIR" "-UCLANG_RESOURCE_DIR" ]
+  */
+  cmakeUnsets = features:
+    assert (lib.isList features);
+    map cmakeUnset features;
 
   /* Create a -D<feature>:STRING=<value> string that can be passed to typical
      CMake invocations.
@@ -801,8 +850,8 @@ rec {
 
     Type: cmakeFeature :: string -> string -> string
 
-     @param condition The condition to be made true or false
-     @param flag The controlling flag of the condition
+     @param feature The feature to set
+     @param value The value of the feature
 
      Example:
        cmakeFeature "MODULES" "badblock"
@@ -812,6 +861,24 @@ rec {
     assert (lib.isString feature);
     assert (lib.isString value);
     cmakeOptionType "string" feature value;
+
+  /* Create an array of -D<condition>:STRING=<value> strings that can be passed to typical
+     CMake invocations.
+
+    Type: cmakeFeatures :: AttrSet -> [string]
+
+     @param features The features to set
+
+     Example:
+       cmakeFeatures {
+        CMAKE_INSTALL_BINDIR = "bin";
+        CMAKE_INSTALL_LIBDIR = "lib";
+       }
+       => [ "-DCMAKE_INSTALL_BINDIR:STRING=bin" "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ]
+  */
+  cmakeFeatures = features:
+    assert (lib.isAttrs features);
+    lib.attrsets.mapAttrsToList cmakeFeature features;
 
   /* Create a -D<feature>=<value> string that can be passed to typical Meson
      invocations.

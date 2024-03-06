@@ -239,6 +239,20 @@ rec {
         (mapAttrs f v)
       );
 
+  /* Prefix each attribute name in the given set with the given prefix and merge them into a new attribute set.
+
+     Type:
+       prefixAttrsNameWiwth :: string -> AttrSet
+
+     Example:
+       prefixAttrsNameWith "p" {
+         x = "a";
+         y = "b";
+       }
+       => { px = "a"; py = "b"; y = "b" }
+  */
+  prefixAttrsNameWith = p:
+    concatMapAttrs (n: v: { ${p + n} = v; });
 
   /* Update or set specific paths of an attribute set.
 
