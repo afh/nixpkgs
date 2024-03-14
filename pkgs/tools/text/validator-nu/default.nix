@@ -45,6 +45,12 @@ stdenvNoCC.mkDerivation rec {
 
   nativeBuildInputs = [ git jdk_headless makeWrapper python3 ];
 
+  postPatch = ''
+    substituteInPlace css-validator/build.xml \
+      --replace-fail 'source="1.7"' 'source="1.8"' \
+      --replace-fail 'target="1.7"' 'target="1.8"'
+  '';
+
   buildPhase = ''
     ln -s '${deps}/dependencies' '${deps}/extras' .
     JAVA_HOME='${jdk_headless}' python checker.py build
