@@ -13117,7 +13117,9 @@ with pkgs;
 
   snapshot = callPackage ../applications/graphics/snapshot { };
 
-  solvespace = callPackage ../applications/graphics/solvespace { };
+  solvespace = callPackage ../applications/graphics/solvespace {
+    inherit (llvmPackages) openmp;
+  };
 
   sonarr = callPackage ../servers/sonarr { };
 

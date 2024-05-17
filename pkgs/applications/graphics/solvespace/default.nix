@@ -22,6 +22,7 @@
 , libspnav
 , libthai
 , libxkbcommon
+, openmp
 , pangomm
 , pcre
 , util-linuxMinimal # provides libmount
@@ -29,14 +30,14 @@
 , zlib
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "solvespace";
   version = "3.1";
 
   src = fetchFromGitHub {
-    owner = pname;
-    repo = pname;
-    rev = "v${version}";
+    owner = "solvespace";
+    repo = "solvespace";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-sSDht8pBrOG1YpsWfC/CLTTWh2cI5pn2PXGH900Z0yA=";
     fetchSubmodules = true;
   };
@@ -61,18 +62,21 @@ stdenv.mkDerivation rec {
     libepoxy
     libGLU
     libpng
-    libselinux
-    libsepol
     libspnav
     libthai
     libxkbcommon
     pangomm
     pcre
-    util-linuxMinimal
     xorg.libpthreadstubs
     xorg.libXdmcp
     xorg.libXtst
     zlib
+  ] ++ lib.optionals stdenv.isDarwin [
+    openmp
+  ] ++ lib.optionals stdenv.isLinux [
+    libselinux
+    libsepol
+    util-linuxMinimal
   ];
 
   postPatch = ''
@@ -85,18 +89,45 @@ stdenv.mkDerivation rec {
     +# include(GetGitCommitHash)
      # and instead uncomment the following, adding the complete git hash of the checkout you are using:
     -# set(GIT_COMMIT_HASH 0000000000000000000000000000000000000000)
-    +set(GIT_COMMIT_HASH $version)
+    +set(GIT_COMMIT_HASH ${finalAttrs.src.rev})
     EOF
+  '' + lib.optionalString stdenv.isDarwin ''
+    substituteInPlace src/CMakeLists.txt \
+      --replace-fail "\''${OpenMP_CXX_INCLUDE_DIRS}/../lib/libomp.dylib" \
+                     "${lib.getLib openmp}/lib/libomp.dylib"
+    # This is a workaround to avoid depending on Xcode. Unfortunately
+    substituteInPlace res/CMakeLists.txt \
+      --replace-fail "iconutil" "\''${ICONUTIL}" \
+      --replace-fail "ibtool" "\''${IBTOOL}"
   '';
 
-  cmakeFlags = [ "-DENABLE_OPENMP=ON" ];
+  postInstall = lib.optionalString stdenv.isDarwin ''
+    mkdir -p $out/Applications
+    cp -r bin/SolveSpace.app $out/Applications/SolveSpace.app
 
-  meta = with lib; {
-    description = "A parametric 3d CAD program";
-    license = licenses.gpl3Plus;
-    maintainers = [ maintainers.edef ];
-    platforms = platforms.linux;
+    install_name_tool -add_rpath $out/lib $out/Applications/SolveSpace.app/Contents/MacOS/SolveSpace
+
+    for wrapper in SolveSpace solvespace-cli; do
+      makeWrapper $out/Applications/SolveSpace.app/Contents/MacOS/$wrapper $out/bin/$wrapper
+    done
+  '';
+
+  CXXFLAGS = lib.optionals stdenv.isDarwin
+    [ "-Wno-unused-but-set-variable" ];
+
+  cmakeFlags = [
+    "-DENABLE_OPENMP=ON"
+  ] ++ lib.optionals stdenv.isDarwin [
+    "-DICONUTIL=/usr/bin/iconutil"
+    "-DIBTOOL=/usr/bin/ibtool"
+  ];
+
+  meta = {
+    description = "Parametric 3d CAD program";
+    license = lib.licenses.gpl3Plus;
+    maintainers = [ lib.maintainers.edef ];
+    platforms = with lib.platforms; linux ++ darwin;
     homepage = "https://solvespace.com";
-    changelog = "https://github.com/solvespace/solvespace/raw/v${version}/CHANGELOG.md";
+    changelog = "https://github.com/solvespace/solvespace/raw/v${finalAttrs.version}/CHANGELOG.md";
   };
-}
+})
