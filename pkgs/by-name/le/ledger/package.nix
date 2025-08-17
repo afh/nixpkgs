@@ -2,14 +2,14 @@
   stdenv,
   lib,
   fetchFromGitHub,
-  fetchpatch2,
   cmake,
-  boost,
+  boost188,
   gmp,
   mpfr,
   libedit,
   python3,
-  gpgme,
+  gpgme2,
+  gpgmepp,
   installShellFiles,
   texinfo,
   gnused,
@@ -17,39 +17,26 @@
   gpgmeSupport ? false,
 }:
 
-stdenv.mkDerivation rec {
+let
+  boost = boost188;
+in
+stdenv.mkDerivation (finalAttrs: {
   pname = "ledger";
-  version = "3.3.2";
+  version = "3.3.2-unstable-2025-08-17";
 
   src = fetchFromGitHub {
     owner = "ledger";
     repo = "ledger";
-    rev = "v${version}";
-    hash = "sha256-Uym4s8EyzXHlISZqThcb6P1H5bdgD9vmdIOLkk5ikG0=";
+    rev = "bbfe4808aaefa6e898aa96127d340bab30f54008";
+    hash = "sha256-jnuPoF2sQFXjZrsgGs/kgxLq5t1y1JKzufc6Z/FcZAg=";
   };
 
-  patches = [
-    (fetchpatch2 {
-      name = "ledger-boost-1.85-compat.patch";
-      url = "https://github.com/ledger/ledger/commit/46207852174feb5c76c7ab894bc13b4f388bf501.patch";
-      hash = "sha256-X0NSN60sEFLvcfMmtVoxC7fidcr5tJUlFVQ/E8qfLss=";
-    })
-    (fetchpatch2 {
-      name = "ledger-boost-1.86-compat-1.patch";
-      url = "https://github.com/ledger/ledger/commit/f6750ed89b46926d1f0859f3b25d18ed62ac219e.patch";
-      hash = "sha256-pktwotuMbZcR2DpZccMqV13524avKvazDX/+Ki6h69g=";
-    })
-    (fetchpatch2 {
-      name = "ledger-boost-1.86-compat-2.patch";
-      url = "https://github.com/ledger/ledger/commit/62f626fa73bd6832028f43c204c43cf15bd5f409.patch";
-      hash = "sha256-cazhSxadNpiA6ofZxS8JALOPy88cNPM/jKHaUYk8pBw=";
-    })
-    (fetchpatch2 {
-      name = "ledger-boost-1.86-compat-3.patch";
-      url = "https://github.com/ledger/ledger/commit/124398c35be573324cf2384c08b99b4476f29e2b.patch";
-      hash = "sha256-N3dUrqNsOiVgedoYmyfYllK+4lvKdMxc8iq0+DgEbxc=";
-    })
-  ];
+  postPatch = ''
+    # Replace deprecated asString with asStdString
+    # see https://github.com/gpg/gpgmepp/blob/cd13d4b00cd19d723574acf843abee95111070fb/src/error.h#L50
+    substituteInPlace src/gpgme.cc \
+      --replace-fail 'asString' 'asStdString'
+  '';
 
   outputs = [
     "out"
@@ -64,7 +51,8 @@ stdenv.mkDerivation rec {
     gnused
   ]
   ++ lib.optionals gpgmeSupport [
-    gpgme
+    gpgme2
+    gpgmepp
   ]
   ++ (
     if usePython then
@@ -112,7 +100,7 @@ stdenv.mkDerivation rec {
     description = "Double-entry accounting system with a command-line reporting interface";
     mainProgram = "ledger";
     homepage = "https://www.ledger-cli.org/";
-    changelog = "https://github.com/ledger/ledger/raw/v${version}/NEWS.md";
+    changelog = "https://github.com/ledger/ledger/raw/v${finalAttrs.version}/NEWS.md";
     license = lib.licenses.bsd3;
     longDescription = ''
       Ledger is a powerful, double-entry accounting system that is accessed
@@ -123,4 +111,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     maintainers = with lib.maintainers; [ jwiegley ];
   };
-}
+})
