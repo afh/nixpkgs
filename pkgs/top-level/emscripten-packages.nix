@@ -128,6 +128,64 @@ rec {
         '';
       });
 
+  ledger =
+    (pkgs.ledger.override {
+      stdenv = emscriptenStdenv;
+      boost = boost;
+      gmp = gmp;
+      mpfr = mpfr;
+      usePython = false;
+    }).overrideAttrs
+      (old: {
+        src = fetchFromGitHub {
+          owner = "gudzpoz";
+          repo = "ledger";
+          #rev = "v${version}";
+          rev = "emscripten-build";
+          hash = "sha256-3fCYFxKclIZFfJVAILHq0jWuC9hK0yk61+iq3jDIZ+I=";
+        };
+        patches = [];
+        patchPhase = ''
+          substituteInPlace src/CMakeLists.txt \
+            --replace-fail \
+              "target_compile_options(libledger PRIVATE -fwasm-exceptions)" \
+              "target_compile_options(libledger PRIVATE -fwasm-exceptions)
+              target_compile_definitions(libledger PRIVATE BOOST_DATE_TIME_USE_CLASSIC_LOCALE)" \
+            --replace-fail \
+              "target_compile_options(ledger PRIVATE -fwasm-exceptions)" \
+              'target_compile_options(ledger PRIVATE -fwasm-exceptions)
+              target_compile_definitions(ledger PRIVATE BOOST_DATE_TIME_USE_CLASSIC_LOCALE)'
+        '';
+        buildInputs = (old.buildInputs or [ ]) ++ [
+          boost gmp mpfr
+        ];
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+          writableTmpDirAsHomeHook
+          which
+        ];
+        propagatedBuildInputs = [ boost gmp mpfr ];
+        NIX_CFLAGS = "-flto";
+        NIX_LDFLAGS = "-Wl,--gc-sections -lnodefs.js -lnoderawfs.js -sSTACK_SIZE=1048576";
+        configurePhase = ''
+          emcmake cmake -S . -B build \
+            -DBUILD_LIBRARY=OFF \
+            -DCMAKE_CXX_FLAGS="-flto -DBOOST_DATE_TIME_NO_LOCALE" \
+            -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections -lnodefs.js -lnoderawfs.js -sSTACK_SIZE=1048576"
+        '';
+        buildPhase = ''
+          #export LDFLAGS="-lnodefs.js -lnoderawfs.js -sSTACK_SIZE=1048576"
+          emmake make -C build -j8
+        '';
+        installPhase = ''
+          mkdir -p $out
+          install -Dm644 build/ledger.js $out
+          install -Dm644 build/ledger.wasm $out
+        '';
+        checkPhase = ''
+          echo TBD
+        '';
+      });
+
   libxml2 =
     (pkgs.libxml2.override {
       stdenv = emscriptenStdenv;
