@@ -128,6 +128,73 @@ rec {
         '';
       });
 
+  ledger =
+    (pkgs.ledger.override {
+      stdenv = emscriptenStdenv;
+      boost = boost;
+      gmp = gmp;
+      mpfr = mpfr;
+      usePython = false;
+    }).overrideAttrs
+      (old: {
+        src = fetchFromGitHub {
+          owner = "gudzpoz";
+          repo = "ledger";
+          #rev = "v${version}";
+          rev = "emscripten-build";
+          hash = "sha256-3fCYFxKclIZFfJVAILHq0jWuC9hK0yk61+iq3jDIZ+I=";
+        };
+        patches = [];
+        patchPhase = ''
+          substituteInPlace src/CMakeLists.txt \
+            --replace-fail \
+              "target_compile_options(libledger PRIVATE -fwasm-exceptions)" \
+              "target_compile_options(libledger PRIVATE -fwasm-exceptions)
+              target_compile_definitions(libledger PRIVATE BOOST_DATE_TIME_USE_CLASSIC_LOCALE)" \
+            --replace-fail \
+              "target_compile_options(ledger PRIVATE -fwasm-exceptions)" \
+              'target_compile_options(ledger PRIVATE -fwasm-exceptions)
+              target_compile_definitions(ledger PRIVATE BOOST_DATE_TIME_USE_CLASSIC_LOCALE)'
+        '';
+        buildInputs = (old.buildInputs or [ ]) ++ [
+          boost gmp mpfr
+        ];
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+          writableTmpDirAsHomeHook
+          which
+        ];
+        propagatedBuildInputs = [ boost gmp mpfr ];
+        configurePhase = ''
+          emcmake cmake -S . -B build \
+            -DBUILD_LIBRARY=OFF \
+            -DCMAKE_CXX_FLAGS="-flto -DBOOST_DATE_TIME_NO_LOCALE" \
+            -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections -lnodefs.js -lnoderawfs.js -sSTACK_SIZE=1048576"
+        '';
+        buildPhase = ''
+          #export LDFLAGS="-lnodefs.js -lnoderawfs.js -sSTACK_SIZE=1048576"
+          emmake make -C build -j8
+
+          # Fix Emscripten TTY issue, for details see
+          # https://github.com/emscripten-core/emscripten/issues/22264
+          sed -i.bak \
+              -e '1i #!${lib.getExe nodejs}' \
+              -e 's/if\s*(!stream.tty)/if(!stream.tty||!stream.tty.ops)/g' \
+              -e 's/,\s*tty:\s*true,/,tty:false,/g' \
+              build/ledger.js
+        '';
+        checkPhase = ''
+          ${lib.getExe nodejs} build/ledger.js --version | grep -o 'Ledger ${old.version}'
+        '';
+        installPhase = ''
+          mkdir -p $out
+          install -Dm555 build/ledger.js $out
+          install -Dm444 build/ledger.wasm $out
+        '';
+        # Fails to build on darwin due to:
+        # wasm-ld: error: greg_month.o: section too large
+        meta = old.meta // { platforms = lib.platforms.linux; };
+      });
+
   libxml2 =
     (pkgs.libxml2.override {
       stdenv = emscriptenStdenv;
