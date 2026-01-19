@@ -8,12 +8,13 @@
 
 stdenv.mkDerivation {
   pname = "gnulib";
-  version = "20241001";
+  version = "20260214";
 
   src = fetchgit {
     url = "https://git.savannah.gnu.org/git/gnulib.git";
-    rev = "0a01f6737dc5666c730bdfe6a038da53a4156cc2";
-    hash = "sha256-kbmXnXXoaTPGwjUJvnHWCQFS2KGQ9fsjIyloNmkKdc4=";
+    branchName = "stable-202601";
+    rev = "b5fe5eef18655492142cf781d60eaebe9cfad04b";
+    hash = "sha256-JIdfYM7EMZ6aFTlY27kLREcp5LSmPLz8azK+3+GqAVc=";
   };
 
   postPatch = ''
