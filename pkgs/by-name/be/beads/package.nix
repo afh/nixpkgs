@@ -5,22 +5,23 @@
   fetchFromGitHub,
   gitMinimal,
   installShellFiles,
+  nix-update-script,
   versionCheckHook,
   writableTmpDirAsHomeHook,
 }:
 
 buildGoModule (finalAttrs: {
   pname = "beads";
-  version = "0.42.0";
+  version = "0.56.1";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-3t+pm7vuFj3PH1oCJ/AnwbGupqleimNQnP2bRSBHrSg=";
+    hash = "sha256-hp+mKVCSzxxxUtOqspXuTbOJpeC8K9+UmmXSDr5Xa0k=";
   };
 
-  vendorHash = "sha256-ovG0EWQFtifHF5leEQTFvTjGvc+yiAjpAaqaV0OklgE=";
+  vendorHash = "sha256-DlEnIVNLHWetwQxTmUNOAuDbHGZ9mmLdITwDdviphPs=";
 
   subPackages = [ "cmd/bd" ];
 
@@ -58,6 +59,9 @@ buildGoModule (finalAttrs: {
   ];
   versionCheckProgramArg = "version";
   doInstallCheck = true;
+  doCheck = false; # requires running dolt database
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Lightweight memory system for AI coding agents with graph-based issue tracking";
