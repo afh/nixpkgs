@@ -20,6 +20,9 @@
   inetutils,
   sysctl,
   unzip,
+
+  ctanMirror ? null,
+  withLatex ? true,
 }:
 
 # Build with  --option sandbox relaxed on NixOS until FODs are added
@@ -186,22 +189,98 @@ stdenv.mkDerivation {
     runHook postBuild
   '';
 
-  installPhase = ''
-    runHook preInstall
-
-    mkdir -p $out
-    make SAVE_SPACE=NO local_install
-
-    # TODO: Convert to fixed output derivation?
-    bash $out/share/kertex/pkg/rcp/tools@pkg.sh install
-    bash $out/share/kertex/pkg/rcp/core@pkg.sh install
-    bash $out/share/kertex/pkg/rcp/rcp@pkg.sh install
-
-    install -Dm444 ${sources.prote_doc} $out/share/kertex/doc/prote_man.pdf
-    installManPage $out/share/kertex/man/man{1,8}/*
-
-    runHook postInstall
+  preInstall = ''
+    cat > .curlrc <<EOF
+    silent
+    EOF
+    export CURL_HOME=$PWD
   '';
+
+  installPhase =
+    let
+      appendSuffix = suffix: list: map (x: "${x}${suffix}") list;
+      pkgRecipes = list: appendSuffix "@pkg.sh" list;
+      fontRecipes = list: appendSuffix "@fonts.sh" list;
+      mpRecipes = list: appendSuffix "@mp.sh" list;
+      texRecipes = list: appendSuffix "@tex.sh" list;
+      latexRecipes = list: appendSuffix "@latex.sh" list;
+      ltxLocalRecipes = latexRecipes [
+        # For some odd reason bookmark and booktabs fail to untar due to permission issues :/
+        "bookmark"
+        "booktabs"
+        "tabularray"
+        "xpatch" # requires etoolbox
+        "koma-script" # requires etoolbox, xpatch
+      ];
+      recipes =
+        (pkgRecipes [
+          "tools"
+          "core"
+          "rcp"
+        ])
+        ++ (mpRecipes [
+          #"m3D"
+        ])
+        ++ (fontRecipes [
+          "lm"
+          "urw"
+          "sansmathaccent" # required by beamer
+        ])
+        ++ (texRecipes [
+          "docstrip" # required by atbegshi
+          "atbegshi" # required by pgf
+          "babel" # required by *@babel
+          "english@babel"
+          "german@babel"
+          "italian@babel"
+          "pgf"
+          "stringenc" # required by beamer
+        ]);
+      ltxRecipes =
+        lib.optionals withLatex [
+          "latex.sh"
+        ]
+        ++ (
+          latexRecipes ([
+            "hyperref"
+            "geometry"
+            "memoir"
+            "xcolor"
+            "etoolbox"
+            "extsizes"
+            "translator"
+            "beamer"
+          ])
+          ++ ltxLocalRecipes
+        );
+    in
+    ''
+      runHook preInstall
+
+      ${lib.optionalString (ctanMirror != null) "export KERTEX_PKG_SRC_SRV=${ctanMirror}"}
+
+      mkdir -p $out
+      make SAVE_SPACE=NO local_install
+
+      # Install local package recipes
+      cp ${./rcp}/* $out/share/kertex/pkg/rcp/
+
+      export PATH=$out/bin:$PATH
+      set -a; source <(which_kertex); set +a
+
+      # TODO: Convert to fixed output derivation?
+      #printf "%s\0" ${lib.concatStringsSep " " recipes} ${lib.optionalString (ltxRecipes != [ ]) lib.concatStringsSep " " ltxRecipes} \
+      #  | xargs -0 -P$NIX_BUILD_CORES -I% bash $out/share/kertex/pkg/rcp/% install
+      for rcp in ${lib.concatStringsSep " " recipes} \
+        ${lib.optionalString (ltxRecipes != [ ]) lib.concatStringsSep " " ltxRecipes} \
+        ; do
+        bash $out/share/kertex/pkg/rcp/$rcp install
+      done
+
+      install -Dm444 ${sources.prote_doc} $out/share/kertex/doc/prote_man.pdf
+
+      runHook postInstall
+    '';
 
   postInstall = ''
     rm -rf $out/share/kertex/man $out/share/kertex/prote/sellette/*.log
